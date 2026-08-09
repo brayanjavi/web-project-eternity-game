@@ -1,0 +1,475 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,700;1,400&family=Press+Start+2P&display=swap');
+
+/* CSS Variables */
+:root {
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-ui: 'Inter', sans-serif;
+  
+  --color-bg: #08080f;
+  --color-text: #f0f0f0;
+  --color-text-muted: #9892a6;
+  
+  --color-gold: #d4a843;
+  --color-voluntad: #8b5cf6;
+  --color-nihilismo: #ef4444;
+  --color-amorfati: #d4a843;
+  --color-creacion: #06b6d4;
+  
+  --bg-glass: rgba(8, 8, 15, 0.95);
+  --border-glass: rgba(255, 255, 255, 0.15);
+}
+
+/* 1. Base styles */
+body {
+  background-color: #000;
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--color-text);
+}
+
+#game {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  height: 100%;
+  max-height: 720px;
+  border: 1px solid #222;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* 2. Title Screen */
+#title-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #1a1a24 0%, #050508 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: opacity 1s ease;
+}
+
+#title-screen h1 {
+  font-family: var(--font-pixel);
+  font-size: clamp(2rem, 5vw, 4rem);
+  color: var(--color-gold);
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(212, 168, 67, 0.5), 0 0 20px rgba(212, 168, 67, 0.3);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+#title-screen .subtitle {
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 50px;
+}
+
+#title-screen .prompt {
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  color: var(--color-text);
+  animation: blink 1.5s infinite;
+  margin-bottom: 40px;
+}
+
+#title-screen .quote {
+  font-family: var(--font-ui);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  max-width: 500px;
+  text-align: center;
+  line-height: 1.5;
+  padding: 0 20px;
+}
+
+#title-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 3. HUD */
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#hud > * {
+  pointer-events: auto;
+}
+
+#hud-cycle {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  background-color: var(--bg-glass);
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-glass);
+  color: var(--color-gold);
+}
+
+#hud-location {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  background-color: var(--bg-glass);
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-glass);
+}
+
+#hud-stats {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  background-color: var(--bg-glass);
+  padding: 10px 20px;
+  border-radius: 4px;
+  border: 1px solid var(--border-glass);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100px;
+}
+
+.stat .label {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+}
+
+.stat[data-stat="voluntad"] .label { color: var(--color-voluntad); }
+.stat[data-stat="nihilismo"] .label { color: var(--color-nihilismo); }
+.stat[data-stat="amorfati"] .label { color: var(--color-amorfati); }
+.stat[data-stat="creacion"] .label { color: var(--color-creacion); }
+
+.stat .bar-container {
+  height: 6px;
+  background-color: #222;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat .bar-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.stat[data-stat="voluntad"] .bar-fill { background-color: var(--color-voluntad); }
+.stat[data-stat="nihilismo"] .bar-fill { background-color: var(--color-nihilismo); }
+.stat[data-stat="amorfati"] .bar-fill { background-color: var(--color-amorfati); }
+.stat[data-stat="creacion"] .bar-fill { background-color: var(--color-creacion); }
+
+/* 4. Dialogue Box */
+#dialogue {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  background-color: var(--bg-glass);
+  border: 2px solid var(--border-glass);
+  border-radius: 4px;
+  padding: 16px 20px;
+  z-index: 50;
+  box-sizing: border-box;
+}
+
+#dialogue .speaker {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: var(--color-gold);
+  margin-bottom: 10px;
+}
+
+#dialogue-text {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  line-height: 1.8;
+  color: white;
+}
+
+#dialogue-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.dialogue-choice {
+  background-color: rgba(0, 0, 0, 0.5);
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: white;
+  text-align: left;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+}
+
+.dialogue-choice:hover {
+  border-color: var(--color-voluntad);
+  background-color: rgba(139, 92, 246, 0.2);
+}
+
+#dialogue-continue {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: var(--color-gold);
+  text-align: right;
+  margin-top: 10px;
+  animation: blink 1s infinite;
+}
+
+/* 5. Transition Overlay */
+#transition-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+#transition-overlay h2 {
+  font-family: var(--font-pixel);
+  font-size: 2rem;
+  color: var(--color-gold);
+  text-shadow: 0 0 10px rgba(212, 168, 67, 0.5);
+}
+
+.fade-in { animation: fadeIn 1s forwards; }
+.fade-out-anim { animation: fadeOut 1s forwards; }
+
+/* 6. Cycle End Overlay */
+#cycle-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(5, 5, 8, 0.95);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+#cycle-overlay h1 {
+  font-family: var(--font-pixel);
+  font-size: 4rem;
+  color: var(--color-gold);
+  text-shadow: 0 0 20px rgba(212, 168, 67, 0.8);
+  margin-bottom: 20px;
+  animation: glitch 3s infinite;
+}
+
+#cycle-overlay p {
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+/* 7. Map Overlay */
+#map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 150;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+#map-overlay h2 {
+  font-family: var(--font-pixel);
+  color: var(--color-gold);
+  margin-bottom: 30px;
+}
+
+#map-locations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.map-location {
+  background-color: var(--bg-glass);
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: white;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.map-location:hover:not(.locked) {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.map-location.current {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 10px rgba(212, 168, 67, 0.3);
+}
+
+.map-location.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 8. Controls Hint */
+#controls {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 5;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: #666;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+
+/* 9. Notification */
+#notification {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: var(--color-gold);
+  padding: 10px 20px;
+  border: 1px solid var(--color-gold);
+  border-radius: 4px;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+#notification.hidden {
+  opacity: 0;
+  transform: translate(-50%, -20px);
+  pointer-events: none;
+}
+
+#notification.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  animation: slideIn 0.3s ease-out;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* 11. Animations */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0) }
+  2% { transform: translate(-2px, 2px) }
+  4% { transform: translate(2px, -2px) }
+  6% { transform: translate(0) }
+  100% { transform: translate(0) }
+}
+
+/* 10. Responsive */
+@media (max-width: 768px) {
+  #hud-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 90%;
+    bottom: 10px;
+  }
+  
+  .stat {
+    width: 40%;
+  }
+
+  #dialogue {
+    bottom: 100px;
+  }
+  
+  #title-screen h1 {
+    font-size: 2.5rem;
+  }
+}
