@@ -138,6 +138,43 @@ style.innerHTML = `
   }
   .map-node:hover { background: rgba(139,92,246,0.15); border-color: #8b5cf6; color: #fff; }
   .map-node.active { border-color: #d4a843; background: rgba(212,168,67,0.1); color: #d4a843; }
+
+  /* Star Wars Crawl Intro Styles */
+  .starwars-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; display: none; flex-direction: column;
+    justify-content: center; align-items: center; overflow: hidden;
+    z-index: 30; font-family: 'Press Start 2P', monospace;
+    perspective: 300px;
+  }
+  .crawl-container {
+    position: absolute; bottom: 0; width: 80%; height: 100%;
+    transform-origin: 50% 100%; transform: rotateX(25deg);
+    overflow: hidden; pointer-events: none;
+  }
+  .crawl-content {
+    position: absolute; bottom: -120%; width: 100%;
+    text-align: justify; color: #e5b13a; font-size: 11px;
+    line-height: 2.2; text-shadow: 0 0 8px rgba(229,177,58,0.5);
+    animation: crawlAnim 32s linear forwards;
+  }
+  .crawl-content h1 {
+    text-align: center; color: #e5b13a; font-size: 18px; margin-bottom: 8px; letter-spacing: 4px;
+  }
+  .crawl-content h2 {
+    text-align: center; color: #d4a843; font-size: 13px; margin-bottom: 24px; letter-spacing: 2px;
+  }
+  .crawl-content p { margin-bottom: 24px; }
+  @keyframes crawlAnim {
+    0% { bottom: -120%; opacity: 1; }
+    90% { opacity: 1; }
+    100% { bottom: 130%; opacity: 0; }
+  }
+  .skip-intro {
+    position: absolute; bottom: 16px; right: 16px; z-index: 35;
+    font-size: 8px; color: #666; background: rgba(0,0,0,0.7);
+    padding: 6px 10px; border: 1px solid rgba(255,255,255,0.1); border-radius: 3px;
+  }
 `;
 document.head.appendChild(style);
 
@@ -199,6 +236,29 @@ titleScreen.innerHTML = `
   <div class="title-controls">WASD/Flechas: Mover · E: Interactuar · T: Avanzar Día · M: Mapa</div>
 `;
 container.appendChild(titleScreen);
+
+const starWarsScreen = document.createElement('div');
+starWarsScreen.className = 'starwars-screen';
+starWarsScreen.id = 'starwars-screen';
+starWarsScreen.innerHTML = `
+  <div class="crawl-container">
+    <div class="crawl-content" id="crawl-text">
+      <h1>ETERNO</h1>
+      <h2>EL RETORNO DE LO MISMO</h2>
+      <p>En un mundo atrapado en un bucle infinito de 7 días, el tiempo no avanza... sólo se repite.</p>
+      <p>Friedrich Nietzsche planteó la pregunta definitiva: "¿Qué harías si un demonio te dijera que tendrás que vivir esta misma vida exactamente igual, una y otra vez por toda la eternidad?"</p>
+      <p>Aquí, el nivel y la fuerza física son una ilusión. El verdadero progreso es el CONOCIMIENTO adquirido en cada ciclo.</p>
+      <p>--- INSTRUCCIONES DE JUEGO ---</p>
+      <p>• WASD / FLECHAS: Muévete por la ciudad, bosque, catedral, mercado y biblioteca.</p>
+      <p>• TECLA E / ESPACIO: Interactúa con personajes y objetos (libros, altares, cofres, tumbas).</p>
+      <p>• TECLA T: Avanza el día. Cada día trae eventos filosóficos únicos. ¡El Día 5 llegará el Demonio!</p>
+      <p>• TECLA M: Abre el mapa para viaje rápido.</p>
+      <p>• TUS DECISIONES moldean 4 estadísticas: Voluntad (VOL), Nihilismo (NIH), Amor Fati (AMO) y Creación (CRE). Alcanza 80 en una para desbloquear 1 de los 5 finales filosóficos.</p>
+    </div>
+  </div>
+  <div class="skip-intro">Presiona ENTER o ESPACIO para saltar</div>
+`;
+container.appendChild(starWarsScreen);
 
 const mapUi = document.createElement('div');
 mapUi.className = 'map-overlay';
@@ -292,21 +352,26 @@ const mapStrings = {
   ],
   mercado: [
     "WWWWWWWWWWWWWWWWWWWW",
-    "WddddddddddddddddW",
-    "WddMMddddMMddddMMdW",
-    "WddMMddddMMddddMMdW",
-    "WddddddddddddddddW",
-    "WddddddddddddddddW",
-    "EpppppppddddddddddW",
-    "WddddddddddddddddW",
-    "WddMMddddMMdddddddW",
-    "WddMMddddMMdddddddW",
-    "WddddddddddddddddW",
-    "WddddddddddddddddW",
-    "WddddddddddddddddW",
-    "WddddddddddddddddW",
+    "WddddddddddddddddddW",
+    "WddMMddddMMddddMMddW",
+    "WddMMddddMMddddMMddW",
+    "WddddddddddddddddddW",
+    "WddddddddddddddddddW",
+    "EpppppppdddddddddddW",
+    "WddddddddddddddddddW",
+    "WddMMddddMMddddddddW",
+    "WddMMddddMMddddddddW",
+    "WddddddddddddddddddW",
+    "WddddddddddddddddddW",
+    "WddddddddddddddddddW",
+    "WddddddddddddddddddW",
     "WWWWWWWWWWWWWWWWWWWW"
   ],
+
+
+
+
+
   biblioteca: [
     "WWWWWWWWWWWWWWWWWWWW",
     "WffffffffffffffffffW",
@@ -438,6 +503,15 @@ const dialogues = {
         ]
       }
     ]
+  },
+  guardian_cycle2: {
+    speaker: 'Guardián',
+    lines: [
+      { text: 'Tú... te conozco. ¿Nos hemos visto antes?' },
+      { text: 'Hay algo en tus ojos que me resulta familiar.' },
+      { text: 'Ten cuidado. El mundo no es tan estable como parece.' }
+    ],
+    effects: { voluntad: 5 }
   },
   guardian_normal: {
     speaker: 'Guardián',
@@ -612,9 +686,144 @@ const dialogues = {
   }
 };
 
+const dailyEvents = {
+  2: [
+    {
+      id: 'fuego_mercado', speaker: 'Evento',
+      lines: [
+        { text: 'Un incendio ha estallado en el mercado.' },
+        { text: '¿A quién ayudas?', choices: [
+          { text: 'Al Panadero', next: null, effects: { amorFati: 10 } },
+          { text: 'Al Mercader', next: null, effects: { nihilismo: 5, creacion: 5 } }
+        ]}
+      ]
+    },
+    {
+      id: 'lluvia_extraña', speaker: 'Evento',
+      lines: [
+        { text: 'Una extraña lluvia cae hacia arriba.' },
+        { text: '¿Qué haces?', choices: [
+          { text: 'Investigar', next: null, effects: { creacion: 8 } },
+          { text: 'Ignorar', next: null, effects: { nihilismo: 5 } }
+        ]}
+      ]
+    }
+  ],
+  3: [
+    {
+      id: 'eco_pasos', speaker: 'Evento',
+      lines: [
+        { text: 'Escuchas tus propios pasos caminando detrás de ti.' },
+        { text: '¿Qué haces?', choices: [
+          { text: 'Darte la vuelta', next: null, effects: { voluntad: 8 } },
+          { text: 'Seguir caminando', next: null, effects: { nihilismo: 5 } }
+        ]}
+      ]
+    },
+    {
+      id: 'libro_cae', speaker: 'Evento',
+      lines: [
+        { text: 'Un libro cae de una estantería de la biblioteca.' },
+        { text: '¿Qué haces?', choices: [
+          { text: 'Leerlo', next: null, effects: { creacion: 10 } },
+          { text: 'Devolverlo', next: null, effects: { amorFati: 5 } }
+        ]}
+      ]
+    }
+  ],
+  4: [
+    {
+      id: 'sombra_espejo', speaker: 'Evento',
+      lines: [
+        { text: 'Ves tu reflejo moverse de forma independiente.' },
+        { text: '¿Qué haces?', choices: [
+          { text: 'Confrontarlo', next: null, effects: { voluntad: 10 } },
+          { text: 'Huir', next: null, effects: { nihilismo: 8 } }
+        ]}
+      ]
+    },
+    {
+      id: 'flor_crece', speaker: 'Evento',
+      lines: [
+        { text: 'Una flor crece a cámara rápida a tus pies.' },
+        { text: '¿Qué haces?', choices: [
+          { text: 'Recogerla', next: null, effects: { creacion: 5 } },
+          { text: 'Verla morir', next: null, effects: { amorFati: 8, nihilismo: 3 } }
+        ]}
+      ]
+    }
+  ],
+  5: [
+    {
+      id: 'demonio_nietzsche', speaker: 'El Demonio',
+      lines: [
+        { text: '¿Qué dirías si te dijera que esta vida, tal como la has vivido, tendrás que vivirla una vez más e innumerables veces más?' },
+        { text: '¿Cuál es tu respuesta?', choices: [
+          { text: '¡Sí! ¡Nada más divino he escuchado!', next: null, effects: { amorFati: 20, voluntad: 10 } },
+          { text: 'Eso sería la peor maldición.', next: null, effects: { nihilismo: 15, voluntad: 5 } },
+          { text: '¿Y si pudiera cambiar algo?', next: null, effects: { creacion: 15, voluntad: 5 } }
+        ]}
+      ]
+    }
+  ],
+  6: [
+    {
+      id: 'ciudad_silencio', speaker: 'Evento',
+      lines: [
+        { text: 'La ciudad entera se sume en un silencio absoluto.' },
+        { text: '¿Qué haces?', choices: [
+          { text: 'Meditar', next: null, effects: { amorFati: 10 } },
+          { text: 'Gritar', next: null, effects: { voluntad: 8, nihilismo: 5 } }
+        ]}
+      ]
+    },
+    {
+      id: 'npc_recuerda', speaker: 'Evento',
+      lines: [
+        { text: 'Alguien en la calle te saluda con un nombre que usaste en un ciclo anterior.' },
+        { text: 'Te quedas pensando...', choices: [
+          { text: 'Asentir', next: null, effects: { amorFati: 5 } },
+          { text: 'Ignorar', next: null, effects: { nihilismo: 5 } }
+        ]}
+      ]
+    }
+  ],
+  7: [
+    {
+      id: 'grieta_cielo', speaker: 'Evento',
+      lines: [
+        { text: 'Una grieta violeta aparece en el cielo gris.' },
+        { text: '¿Qué haces?', choices: [
+          { text: 'Alcanzarla', next: null, effects: { voluntad: 15 } },
+          { text: 'Aceptar el ciclo', next: null, effects: { amorFati: 15 } }
+        ]}
+      ]
+    }
+  ]
+};
+
+const bookQuotes = [
+  '"Quien tiene un porqué para vivir, puede soportar casi cualquier cómo." — Nietzsche',
+  '"No hay hechos, solo interpretaciones." — Nietzsche',
+  '"Aquello que se hace por amor, está más allá del bien y del mal." — Nietzsche',
+  '"El hombre es una cuerda tendida entre el animal y el Superhombre." — Nietzsche',
+  '"Hay que tener caos dentro de sí para dar a luz una estrella danzarina." — Nietzsche',
+  '"La madurez del hombre: haber recobrado la seriedad que de niño tenía al jugar." — Nietzsche',
+  '"Invisible hilos son los lazos más fuertes." — Nietzsche',
+  '"¿Es el hombre solo un error de Dios, o Dios solo un error del hombre?" — Nietzsche'
+];
+
+const signTexts = [
+  'E: Interactuar con objetos y personas',
+  'T: El tiempo avanza... ¿o retrocede?',
+  'M: El mapa revela caminos olvidados',
+  'Tus estadísticas definen tu destino',
+  'El conocimiento persiste entre ciclos'
+];
+
 // --- Game State ---
 const game = {
-  state: 'title', // title, playing, dialog, transition, map
+  state: 'title', // title, playing, dialog, transition, map, ending
   cycle: 1,
   day: 1,
   currentMap: 'ciudad_central',
@@ -630,7 +839,20 @@ const game = {
   dialog: { current: null, line: 0, char: 0, active: false, timer: 0, choices: null, chosen: 0 },
   particles: [],
   time: 0,
-  fade: 0
+  fade: 0,
+  eventsTriggered: [],
+  memory: {
+    totalCycles: 0,
+    npcsTalkedTo: new Set(),
+    eventsExperienced: [],
+    choicesMade: [],
+    objectsInteracted: new Set(),
+    knowledgeFragments: [],
+    demonEncounters: 0,
+  },
+  shake: { intensity: 0, duration: 0, timer: 0 },
+  ghosts: [],
+  glitch: 0
 };
 
 // --- Input Handling ---
@@ -655,7 +877,11 @@ window.addEventListener('keyup', e => {
 
 function handleKeyPress(key) {
   if (game.state === 'title' && key === 'Enter') {
+    showIntro();
+  } else if (game.state === 'intro' && (key === 'Enter' || key === ' ' || key === 'Escape')) {
     startGame();
+  } else if (game.state === 'ending' && key === 'Enter') {
+    restartGame();
   } else if (game.state === 'playing') {
     if (key === 'e' || key === ' ') checkInteract();
     if (key === 't') advanceDay();
@@ -673,8 +899,36 @@ function handleKeyPress(key) {
 }
 
 // --- Logic ---
-function startGame() {
+let introTimeout = null;
+
+function showIntro() {
+  window.AudioManager?.init?.();
+  window.AudioManager?.playNotification?.();
   document.getElementById('title').style.display = 'none';
+  
+  const intro = document.getElementById('starwars-screen');
+  intro.style.display = 'flex';
+  game.state = 'intro';
+
+  // Re-trigger animation
+  const crawl = document.getElementById('crawl-text');
+  crawl.style.animation = 'none';
+  crawl.offsetHeight; // trigger reflow
+  crawl.style.animation = 'crawlAnim 32s linear forwards';
+
+  // Auto start game when crawl finishes
+  if (introTimeout) clearTimeout(introTimeout);
+  introTimeout = setTimeout(() => {
+    if (game.state === 'intro') startGame();
+  }, 32000);
+}
+
+function startGame() {
+  if (introTimeout) clearTimeout(introTimeout);
+  window.AudioManager?.init?.();
+  window.AudioManager?.playAmbient?.('ciudad_central');
+  document.getElementById('title').style.display = 'none';
+  document.getElementById('starwars-screen').style.display = 'none';
   game.state = 'playing';
   updateHUD();
   showNotification('El ciclo comienza...');
@@ -690,6 +944,7 @@ function updateHUD() {
 }
 
 function showNotification(text) {
+  window.AudioManager?.playNotification?.();
   const n = document.getElementById('notification');
   n.innerText = text;
   n.style.opacity = 1;
@@ -698,11 +953,48 @@ function showNotification(text) {
 
 function applyEffects(eff) {
   if (!eff) return;
+  let isPositive = false;
   for (let k in eff) {
+    if (eff[k] > 0) isPositive = true;
     game.stats[k] = Math.max(0, Math.min(100, game.stats[k] + eff[k]));
     showNotification(`${k.toUpperCase()} ${eff[k] > 0 ? '+' : ''}${eff[k]}`);
   }
+  window.AudioManager?.playStatChange?.(isPositive);
   updateHUD();
+}
+
+function triggerShake(intensity, duration) {
+  game.shake.intensity = intensity;
+  game.shake.timer = duration;
+}
+
+function triggerEvent(day) {
+  const events = dailyEvents[day];
+  if (!events || events.length === 0) return false;
+  const ev = events[Math.floor(Math.random() * events.length)];
+  game.eventsTriggered.push(ev.id);
+  game.memory.eventsExperienced.push(ev.id);
+  
+  if (ev.id === 'demonio_nietzsche') game.memory.demonEncounters++;
+
+  window.AudioManager?.playEventAlert?.();
+  
+  game.state = 'dialog';
+  game.dialog.current = {
+    speaker: ev.speaker,
+    lines: [...ev.lines]
+  };
+  game.dialog.line = 0;
+  game.dialog.char = 0;
+  game.dialog.timer = 0;
+  game.dialog.active = true;
+  game.dialog.choices = null;
+  document.getElementById('d-speaker').innerText = ev.speaker;
+  document.getElementById('d-text').innerText = '';
+  document.getElementById('d-choices').innerHTML = '';
+  dialogBox.style.display = 'flex';
+  
+  return true;
 }
 
 function advanceDay() {
@@ -713,19 +1005,105 @@ function advanceDay() {
     showNotification('Día ' + game.day);
     updateHUD();
     updateNPCs();
+    triggerEvent(game.day);
   }
 }
 
+function checkEnding() {
+  if (game.cycle >= 3) {
+    let type = null;
+    let title = '';
+    let text = '';
+    if (game.stats.voluntad >= 80) {
+      type = 'voluntad';
+      title = 'EL SUPERHOMBRE';
+      text = 'Has trascendido el ciclo. No lo destruyes — lo superas. Eres el puente entre lo que fue y lo que será.';
+    } else if (game.stats.nihilismo >= 80) {
+      type = 'nihilismo';
+      title = 'EL ABISMO';
+      text = 'El abismo te devolvió la mirada... y tú parpadeaste. El mundo se deshace en fragmentos de sin-sentido.';
+    } else if (game.stats.amorFati >= 80) {
+      type = 'amorFati';
+      title = 'AMOR FATI';
+      text = '"¡Sí! ¡Una vez más!" — abrazas cada instante, cada dolor, cada alegría. El ciclo no es tu prisión, es tu hogar.';
+    } else if (game.stats.creacion >= 80) {
+      type = 'creacion';
+      title = 'EL ARTISTA';
+      text = 'De las cenizas del viejo mundo, forjas valores nuevos. Cada ciclo es un lienzo en blanco.';
+    } else if (game.stats.voluntad >= 40 && game.stats.voluntad <= 60 && 
+               game.stats.nihilismo >= 40 && game.stats.nihilismo <= 60 &&
+               game.stats.amorFati >= 40 && game.stats.amorFati <= 60 &&
+               game.stats.creacion >= 40 && game.stats.creacion <= 60) {
+      type = 'equilibrio';
+      title = 'EL EQUILIBRIO';
+      text = 'Comprendes que la pregunta de Nietzsche no tiene respuesta... porque la pregunta ES la respuesta.';
+    }
+    
+    if (type) {
+      showEnding(type, title, text);
+      return true;
+    }
+  }
+  return false;
+}
+
+
+function showEnding(type, title, text) {
+  window.AudioManager?.playEnding?.(type);
+  game.state = 'ending';
+  const overlay = document.getElementById('overlay');
+  overlay.innerHTML = `
+    <h1 style="font-size:36px;letter-spacing:12px;color:#d4a843;text-shadow:0 0 30px rgba(212,168,67,0.6);margin-bottom:24px;text-align:center;">${title}</h1>
+    <p style="font-size:12px;color:#eee;max-width:600px;text-align:center;line-height:2;margin-bottom:30px;font-style:italic;">${text}</p>
+    <div style="font-size:10px;color:#aaa;margin-bottom:10px;">Estadísticas Finales:</div>
+    <div style="font-size:8px;color:#8b5cf6;margin-bottom:4px;">Voluntad: ${game.stats.voluntad}</div>
+    <div style="font-size:8px;color:#ef4444;margin-bottom:4px;">Nihilismo: ${game.stats.nihilismo}</div>
+    <div style="font-size:8px;color:#d4a843;margin-bottom:4px;">Amor Fati: ${game.stats.amorFati}</div>
+    <div style="font-size:8px;color:#06b6d4;margin-bottom:24px;">Creación: ${game.stats.creacion}</div>
+    <div style="font-size:10px;color:#9892a6;margin-bottom:30px;">Ciclos vividos: ${game.cycle}</div>
+    <div class="blink" style="font-size:10px;color:#d4a843;cursor:pointer;" onclick="restartGame()">Presiona ENTER para renacer</div>
+  `;
+  overlay.style.opacity = 1;
+}
+
+window.restartGame = function() {
+  game.memory.totalCycles++;
+  game.cycle = 1;
+  game.day = 1;
+  game.stats = { voluntad: 30, nihilismo: 20, amorFati: 15, creacion: 25 };
+  game.player.x = 9; game.player.y = 11;
+  game.player.tx = 9; game.player.ty = 11;
+  game.currentMap = 'ciudad_central';
+  game.eventsTriggered = [];
+  updateNPCs();
+  updateHUD();
+  document.getElementById('overlay').style.opacity = 0;
+  setTimeout(() => {
+    document.getElementById('overlay').innerHTML = '';
+    game.state = 'title';
+    document.getElementById('title').style.display = 'flex';
+  }, 1000);
+};
+
 function endCycle() {
+  window.AudioManager?.playCycleEnd?.();
   game.state = 'transition';
+  game.glitch = 1.0;
+  triggerShake(5, 1.0);
+  
   document.getElementById('overlay').innerHTML = `<h1 style="font-size:32px;letter-spacing:8px;color:#d4a843;text-shadow:0 0 20px rgba(212,168,67,0.4);margin-bottom:16px;">CICLO ${game.cycle}</h1><p style="font-size:10px;color:#9892a6;margin-bottom:8px;">El mundo se reinicia...</p><p style="font-size:10px;color:#d4a843;">Tu conocimiento permanece.</p>`;
   document.getElementById('overlay').style.opacity = 1;
+  
   setTimeout(() => {
+    if (checkEnding()) return;
+
+    game.memory.totalCycles++;
     game.cycle++;
     game.day = 1;
     game.player.x = 9; game.player.y = 11;
     game.player.tx = 9; game.player.ty = 11;
     game.currentMap = 'ciudad_central';
+    game.eventsTriggered = [];
     updateNPCs();
     updateHUD();
     document.getElementById('overlay').style.opacity = 0;
@@ -740,6 +1118,9 @@ function endCycle() {
 function updateNPCs() {
   const p = maps.mercado.npcs.find(n => n.id === 'panadero');
   if (p) p.d = game.day >= 5 ? 'panadero_day5' : 'panadero_day1';
+  
+  const g = maps.ciudad_central.npcs.find(n => n.id === 'guardian');
+  if (g) g.d = game.cycle >= 2 ? 'guardian_cycle2' : 'guardian_intro';
 }
 
 function getWalkable(mx, my) {
@@ -756,6 +1137,11 @@ function checkInteract() {
   if (game.player.dir === 'left') ix -= 1;
   if (game.player.dir === 'right') ix += 1;
 
+  ix = Math.round(ix);
+  iy = Math.round(iy);
+
+  window.AudioManager?.playInteract?.();
+
   const m = maps[game.currentMap];
   for (let npc of m.npcs) {
     if (npc.cond && !npc.cond(game)) continue;
@@ -764,17 +1150,116 @@ function checkInteract() {
       return;
     }
   }
+
+  // Check interactive tiles
+  if (ix >= 0 && ix < MAP_W && iy >= 0 && iy < MAP_H) {
+    let tId = m.tiles[iy][ix];
+    let t = TILE_TYPES[tId];
+    
+    if (t.name === 'bookshelf') {
+      let q = bookQuotes[Math.floor(Math.random() * bookQuotes.length)];
+      showCustomDialog('Estantería', q, { creacion: 3 });
+      game.memory.objectsInteracted.add(`bookshelf_${ix}_${iy}`);
+    } else if (t.name === 'altar') {
+      showAltarDialog();
+    } else if (t.name === 'chest') {
+      let cId = `chest_${game.cycle}_${ix}_${iy}`;
+      if (game.memory.objectsInteracted.has(cId)) {
+        showCustomDialog('Cofre', 'Ya has abierto este cofre en este ciclo.', null);
+      } else {
+        game.memory.objectsInteracted.add(cId);
+        let statKeys = ['voluntad', 'nihilismo', 'amorFati', 'creacion'];
+        let rStat = statKeys[Math.floor(Math.random() * statKeys.length)];
+        let eff = {}; eff[rStat] = 8;
+        showCustomDialog('Cofre', `Encuentras un fragmento cristalizado...`, eff);
+      }
+    } else if (t.name === 'grave') {
+      let domStat = Object.keys(game.stats).reduce((a, b) => game.stats[a] > game.stats[b] ? a : b);
+      let text = '';
+      if (domStat === 'voluntad') text = '"Aquí yace aquel que no se rindió."';
+      else if (domStat === 'nihilismo') text = '"Aquí yace la nada."';
+      else if (domStat === 'amorFati') text = '"Volvería a vivirlo todo."';
+      else text = '"Creador hasta el final."';
+      text += `\n(Ciclo ${game.cycle})`;
+      showCustomDialog('Tumba', text, { voluntad: 3 });
+    } else if (t.name === 'sign') {
+      let s = signTexts[Math.floor(Math.random() * signTexts.length)];
+      showCustomDialog('Letrero', s, null);
+    } else if (t.name === 'fountain_water') {
+      showCustomDialog('Fuente', 'Las aguas reflejan... ¿eres tú o es tu otro yo?', { amorFati: 2 });
+    }
+  }
 }
 
-function startDialog(npc) {
+function showCustomDialog(speaker, text, effects) {
+  window.AudioManager?.playDialogOpen?.();
   game.state = 'dialog';
-  game.dialog.current = dialogues[npc.d];
+  game.dialog.current = {
+    speaker: speaker,
+    lines: [
+      { text: text, effects: effects }
+    ]
+  };
   game.dialog.line = 0;
   game.dialog.char = 0;
   game.dialog.timer = 0;
   game.dialog.active = true;
   game.dialog.choices = null;
-  document.getElementById('d-speaker').innerText = npc.name || game.dialog.current.speaker;
+  document.getElementById('d-speaker').innerText = speaker;
+  document.getElementById('d-text').innerText = '';
+  document.getElementById('d-choices').innerHTML = '';
+  dialogBox.style.display = 'flex';
+}
+
+function showAltarDialog() {
+  window.AudioManager?.playDialogOpen?.();
+  game.state = 'dialog';
+  game.dialog.current = {
+    speaker: 'Altar',
+    lines: [
+      { text: 'Un altar antiguo. Puedes sacrificar 10 de una estadística para ganar 15 en otra.' },
+      { text: '¿Qué ofreces?', choices: [
+        { text: 'Sacrificar Nihilismo por Voluntad', next: null, action: () => { if(game.stats.nihilismo>=10){game.stats.nihilismo-=10; applyEffects({voluntad: 15});} } },
+        { text: 'Sacrificar Voluntad por Amor Fati', next: null, action: () => { if(game.stats.voluntad>=10){game.stats.voluntad-=10; applyEffects({amorFati: 15});} } },
+        { text: 'No hacer nada', next: null }
+      ]}
+    ]
+  };
+  game.dialog.line = 0;
+  game.dialog.char = 0;
+  game.dialog.timer = 0;
+  game.dialog.active = true;
+  game.dialog.choices = null;
+  document.getElementById('d-speaker').innerText = 'Altar';
+  document.getElementById('d-text').innerText = '';
+  document.getElementById('d-choices').innerHTML = '';
+  dialogBox.style.display = 'flex';
+}
+
+function startDialog(npc) {
+  window.AudioManager?.playDialogOpen?.();
+  if (npc.id) game.memory.npcsTalkedTo.add(npc.id);
+  
+  game.state = 'dialog';
+  let dId = npc.d;
+  let original = dialogues[dId];
+  
+  game.dialog.current = {
+    speaker: npc.name || original.speaker,
+    effects: original.effects,
+    lines: [...original.lines]
+  };
+  
+  if (game.cycle >= 6 && npc.id) {
+    game.dialog.current.lines.push({ text: `[Ciclo ${game.cycle}] La repetición se hace pesada, ¿no lo sientes?` });
+  }
+
+  game.dialog.line = 0;
+  game.dialog.char = 0;
+  game.dialog.timer = 0;
+  game.dialog.active = true;
+  game.dialog.choices = null;
+  document.getElementById('d-speaker').innerText = game.dialog.current.speaker;
   document.getElementById('d-text').innerText = '';
   document.getElementById('d-choices').innerHTML = '';
   dialogBox.style.display = 'flex';
@@ -804,19 +1289,28 @@ function endDialog() {
   dialogBox.style.display = 'none';
 }
 
-function selectChoice(idx) {
+window.selectChoice = function(idx) {
+  window.AudioManager?.playDialogChoice?.();
   const lineData = game.dialog.current.lines[game.dialog.line];
   const choice = lineData.choices[idx];
+  
   if (choice.effects) applyEffects(choice.effects);
+  if (choice.action) choice.action();
+  
   if (choice.next) {
-    game.dialog.current = dialogues[choice.next];
+    let original = dialogues[choice.next];
+    game.dialog.current = {
+      speaker: original.speaker,
+      effects: original.effects,
+      lines: [...original.lines]
+    };
     game.dialog.line = 0;
     game.dialog.char = 0;
     document.getElementById('d-choices').innerHTML = '';
   } else {
     endDialog();
   }
-}
+};
 
 function renderDialogText() {
   const lineData = game.dialog.current.lines[game.dialog.line];
@@ -855,6 +1349,7 @@ function toggleMap() {
 function travelTo(mapId) {
   document.getElementById('map-ui').style.display = 'none';
   game.state = 'transition';
+  window.AudioManager?.playAmbient?.(mapId);
   document.getElementById('overlay').innerHTML = `<h2>${maps[mapId].name}</h2>`;
   document.getElementById('overlay').style.opacity = 1;
   setTimeout(() => {
@@ -870,6 +1365,7 @@ function travelTo(mapId) {
 
 function changeMap(exit) {
   game.state = 'transition';
+  window.AudioManager?.playAmbient?.(exit.target);
   document.getElementById('overlay').innerHTML = `<h2>${maps[exit.target].name}</h2>`;
   document.getElementById('overlay').style.opacity = 1;
   setTimeout(() => {
@@ -901,6 +1397,7 @@ function update(dt) {
           game.player.tx = nx;
           game.player.ty = ny;
           game.player.moving = true;
+          window.AudioManager?.playFootstep?.();
         }
       }
     }
@@ -910,10 +1407,16 @@ function update(dt) {
       let dy = game.player.ty - game.player.y;
       let dist = Math.sqrt(dx*dx + dy*dy);
       
+      if (Math.random() < 0.2) {
+        game.ghosts.unshift({x: game.player.x, y: game.player.y, dir: game.player.dir, frame: game.player.frame});
+        if (game.ghosts.length > 8) game.ghosts.pop();
+      }
+
       if (dist < game.player.speed * dt) {
         game.player.x = game.player.tx;
         game.player.y = game.player.ty;
         game.player.moving = false;
+        game.ghosts = [];
         
         // Check exits
         const m = maps[game.currentMap];
@@ -930,17 +1433,39 @@ function update(dt) {
       game.player.frame += dt * 8;
     } else {
       game.player.frame = 0;
+      game.ghosts = [];
     }
 
-    // Particles
+    // Particles logic per map
     if (Math.random() < 0.1 && game.particles.length < 30) {
+      let pColor = '#fff';
+      let vx = (Math.random() - 0.5) * 10;
+      let vy = (Math.random() - 0.5) * 10;
+      
+      if (game.currentMap === 'ciudad_central') {
+        pColor = '#ffd700'; // Golden dust
+        vy = -Math.abs(vy) - 5;
+      } else if (game.currentMap === 'mercado') {
+        pColor = '#d2b48c'; // Sand
+        vx = 15; vy = 2;
+      } else if (game.currentMap === 'biblioteca') {
+        pColor = '#8bf'; // glowing letters
+        vy = -Math.abs(vy) * 0.5;
+      } else if (game.currentMap === 'catedral') {
+        pColor = '#fa0'; // candle light
+        vy = -10;
+      } else if (game.currentMap === 'bosque') {
+        pColor = '#af5'; // fireflies
+        vx = Math.sin(game.time * 5) * 10;
+      }
+
       game.particles.push({
         x: Math.random() * MAP_W * TILE_SIZE,
         y: Math.random() * MAP_H * TILE_SIZE,
-        vx: (Math.random() - 0.5) * 10,
-        vy: (Math.random() - 0.5) * 10,
+        vx: vx,
+        vy: vy,
         life: 1.0,
-        color: game.currentMap === 'bosque' ? '#af5' : '#fff'
+        color: pColor
       });
     }
   } else if (game.state === 'dialog') {
@@ -963,10 +1488,12 @@ function update(dt) {
     p.life -= dt * 0.5;
     if (p.life <= 0) game.particles.splice(i, 1);
   }
+  
+  if (game.glitch > 0) game.glitch -= dt;
+  if (game.shake.timer > 0) game.shake.timer -= dt;
 }
 
 // --- Rendering ---
-// Seeded random for procedural tile details
 function seededRandom(x, y) {
   let h = Math.imul(x ^ y, 0x9E3779B9);
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
@@ -975,7 +1502,7 @@ function seededRandom(x, y) {
 function renderMap() {
   const m = maps[game.currentMap];
   
-  // Cycle saturation modifier
+  // Cycle saturation modifier & hue
   let sat = Math.min(1.0, 0.4 + (game.cycle - 1) * 0.1);
   ctx.filter = `saturate(${sat * 100}%)`;
 
@@ -986,7 +1513,10 @@ function renderMap() {
       let px = x * TILE_SIZE;
       let py = y * TILE_SIZE;
       
-      ctx.fillStyle = t.color;
+      let tColor = t.color;
+      if (t.name === 'grass' && game.cycle >= 4) tColor = '#2a4a28'; // Darker grass
+      
+      ctx.fillStyle = tColor;
       ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
       
       // Procedural details
@@ -997,13 +1527,22 @@ function renderMap() {
         for(let i=0; i<4; i++) {
           let dx = Math.floor(seededRandom(x*i, y) * TILE_SIZE);
           let dy = Math.floor(seededRandom(x, y*i) * TILE_SIZE);
-          ctx.fillStyle = sr > 0.5 ? '#1a4a28' : '#3a6a48';
+          ctx.fillStyle = sr > 0.5 ? '#1a4a28' : (game.cycle >= 4 ? '#2a3a28' : '#3a6a48');
           ctx.fillRect(px+dx, py+dy, 2, 2);
         }
       } else if (t.name === 'stone_floor' || t.name === 'wall') {
         ctx.fillRect(px, py, TILE_SIZE, 1);
         ctx.fillRect(px, py, 1, TILE_SIZE);
         if (sr > 0.8) ctx.fillRect(px+4, py+4, 2, 2);
+        if (game.cycle >= 2 && sr < 0.05) {
+           ctx.save();
+           ctx.font = '5px "Press Start 2P", monospace';
+           ctx.fillStyle = 'rgba(255,255,255,0.08)';
+           let words = ['?', 'Ciclo', 'Fati'];
+           ctx.fillText(words[Math.floor(sr*100)%3], px+1, py+10);
+           ctx.restore();
+           ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        }
       } else if (t.name === 'water' || t.name === 'fountain_water') {
         let wave = Math.sin(game.time * 2 + x + y) * 2;
         ctx.fillStyle = 'rgba(255,255,255,0.2)';
@@ -1096,6 +1635,21 @@ function render() {
   
   if (game.state === 'title') return;
   
+  ctx.save();
+  if (game.shake.timer > 0) {
+    let dx = (Math.random() - 0.5) * game.shake.intensity;
+    let dy = (Math.random() - 0.5) * game.shake.intensity;
+    ctx.translate(dx, dy);
+  }
+
+  // Glitch underlay
+  if (game.glitch > 0) {
+    if (Math.random() < 0.3) {
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      ctx.fillRect(0, Math.random() * canvas.height, canvas.width, Math.random() * 5);
+    }
+  }
+  
   renderMap();
   
   // Exits and Torches lighting effects
@@ -1118,13 +1672,23 @@ function render() {
     }
   }
   
+  // Draw Ghosts
+  for (let i = 0; i < game.ghosts.length; i++) {
+    let g = game.ghosts[i];
+    ctx.globalAlpha = Math.max(0, 0.15 - (i * 0.015));
+    drawCharacter(g.x, g.y, '#111', '#f5d5b5', '#335', g.dir, g.frame, true);
+  }
+  ctx.globalAlpha = 1.0;
+
   // Draw Player
   drawCharacter(game.player.x, game.player.y, '#111', '#f5d5b5', '#335', game.player.dir, game.player.frame, true);
   
   // Particles
   for (let p of game.particles) {
     ctx.fillStyle = p.color;
-    ctx.globalAlpha = p.life;
+    let alpha = p.life;
+    if (game.currentMap === 'bosque') alpha = p.life * (0.5 + 0.5 * Math.sin(game.time * 10 + p.x));
+    ctx.globalAlpha = Math.max(0, alpha);
     ctx.fillRect(p.x, p.y, 1.5, 1.5);
   }
   ctx.globalAlpha = 1.0;
@@ -1142,11 +1706,23 @@ function render() {
   }
   
   // Vignette
+  let gColor1 = game.cycle >= 6 ? 'rgba(30,10,40,0)' : 'rgba(0,0,0,0)';
+  let gColor2 = game.cycle >= 6 ? 'rgba(40,10,50,0.6)' : 'rgba(0,0,0,0.5)';
   let grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, canvas.height/3, canvas.width/2, canvas.height/2, canvas.width);
-  grad.addColorStop(0, 'rgba(0,0,0,0)');
-  grad.addColorStop(1, 'rgba(0,0,0,0.5)');
+  grad.addColorStop(0, gColor1);
+  grad.addColorStop(1, gColor2);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.restore();
+
+  // Visual "tear" for cycle 3+
+  if (game.cycle >= 3 && Math.random() < 0.02) {
+    let ty = Math.random() * canvas.height;
+    let th = Math.random() * 5 + 2;
+    let tx = (Math.random() - 0.5) * 8;
+    ctx.drawImage(canvas, 0, ty, canvas.width, th, tx, ty, canvas.width, th);
+  }
 }
 
 // --- Main Loop ---
