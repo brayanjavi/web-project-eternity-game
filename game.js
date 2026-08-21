@@ -175,6 +175,86 @@ style.innerHTML = `
     font-size: 8px; color: #666; background: rgba(0,0,0,0.7);
     padding: 6px 10px; border: 1px solid rgba(255,255,255,0.1); border-radius: 3px;
   }
+  .qte-indicator {
+    position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+    font-size: 14px; color: #fbbf24; font-family: 'Press Start 2P', monospace;
+    text-shadow: 0 0 10px rgba(251,191,36,0.8); pointer-events: none;
+    display: none; z-index: 25; text-align: center;
+  }
+
+  /* Arcade Mobile Controls Styles */
+  .mobile-controls {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 40; display: none;
+    user-select: none; -webkit-user-select: none;
+  }
+  @media (pointer: coarse), (max-width: 900px) {
+    .mobile-controls { display: block; }
+  }
+  .arcade-btn {
+    pointer-events: auto;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), rgba(0,0,0,0.7));
+    border: 2px solid rgba(255,255,255,0.4);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8), inset 0 0 8px rgba(255,255,255,0.2);
+    border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    color: #fff; font-family: 'Press Start 2P', monospace; font-size: 10px;
+    touch-action: none; cursor: pointer; text-shadow: 1px 1px 2px #000;
+  }
+  .arcade-btn:active, .arcade-btn.active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.9), inset 0 0 12px rgba(255,255,255,0.4);
+  }
+  .dpad-container {
+    position: absolute; bottom: 16px; left: 16px; width: 130px; height: 130px;
+  }
+  .dpad-btn {
+    position: absolute; width: 42px; height: 42px;
+    background: rgba(30, 30, 45, 0.85); border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3); font-size: 12px;
+  }
+  .dpad-up { top: 0; left: 44px; }
+  .dpad-down { bottom: 0; left: 44px; }
+  .dpad-left { top: 44px; left: 0; }
+  .dpad-right { top: 44px; right: 0; }
+  
+  .action-buttons {
+    position: absolute; bottom: 16px; right: 16px; width: 140px; height: 130px;
+  }
+  .btn-action-a {
+    position: absolute; bottom: 10px; right: 10px; width: 52px; height: 52px;
+    background: linear-gradient(135deg, #10b981, #047857); border-color: #34d399;
+  }
+  .btn-action-b {
+    position: absolute; bottom: 35px; right: 70px; width: 44px; height: 44px;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9); border-color: #a78bfa;
+  }
+  .btn-action-dash {
+    position: absolute; top: 0px; right: 15px; width: 40px; height: 40px;
+    background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #fbbf24; font-size: 8px;
+  }
+  .top-mobile-bar {
+    position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; pointer-events: none;
+  }
+  .pill-btn {
+    pointer-events: auto;
+    background: rgba(20, 20, 35, 0.85); border: 1px solid rgba(255,255,255,0.3);
+    color: #e2e8f0; border-radius: 12px; padding: 6px 12px;
+    font-size: 7px; font-family: 'Press Start 2P', monospace;
+  }
+  .pill-btn:active { background: rgba(139,92,246,0.4); }
+
+  /* Number keys row for library/cathedral minigames */
+  .mobile-numpad {
+    position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%);
+    display: none; gap: 10px; pointer-events: auto; z-index: 45;
+  }
+  .num-btn {
+    width: 40px; height: 40px; background: rgba(15, 23, 42, 0.9);
+    border: 2px solid #38bdf8; border-radius: 6px; color: #38bdf8;
+    display: flex; justify-content: center; align-items: center;
+    font-family: 'Press Start 2P', monospace; font-size: 11px;
+  }
+  .num-btn:active { background: #38bdf8; color: #000; }
 `;
 document.head.appendChild(style);
 
@@ -202,7 +282,10 @@ hud.innerHTML = `
   </div>
   <div class="top-right">
     <div id="cycle-display">Ciclo 1</div>
-    <div id="day-display">Día 1</div>
+    <div id="day-display">Día 1 · 08:00</div>
+    <div style="width:100%;height:3px;background:rgba(255,255,255,0.1);margin-top:4px;border-radius:2px;overflow:hidden;">
+      <div id="day-progress" style="width:0%;height:100%;background:linear-gradient(90deg,#d4a843,#f59e0b);"></div>
+    </div>
   </div>
 `;
 
@@ -220,6 +303,11 @@ notification.className = 'notification';
 notification.id = 'notification';
 container.appendChild(notification);
 
+const qteDisplay = document.createElement('div');
+qteDisplay.className = 'qte-indicator';
+qteDisplay.id = 'qte-display';
+container.appendChild(qteDisplay);
+
 const overlay = document.createElement('div');
 overlay.className = 'overlay';
 overlay.id = 'overlay';
@@ -230,10 +318,10 @@ titleScreen.className = 'title-screen';
 titleScreen.id = 'title';
 titleScreen.innerHTML = `
   <div class="title-text">ETERNO</div>
-  <div class="title-sub">El conocimiento es el verdadero progreso</div>
-  <div class="blink" style="font-size:10px;color:#d4a843;">Presiona ENTER para comenzar</div>
-  <div class="title-quote">"Un RPG donde el progreso no depende del nivel del personaje, sino del conocimiento adquirido durante cada ciclo."</div>
-  <div class="title-controls">WASD/Flechas: Mover · E: Interactuar · T: Avanzar Día · M: Mapa</div>
+  <div class="title-sub">Aventura Filosófica y Desafíos de Reflejos</div>
+  <div class="blink" style="font-size:10px;color:#d4a843;cursor:pointer;" onclick="showIntro()">Toca o presiona ENTER para comenzar</div>
+  <div class="title-quote">"Un viaje dinámico de puzzles, esquivas contrarreloj y la prueba del Eterno Retorno."</div>
+  <div class="title-controls">WASD/D-Pad: Mover · DASH: Impulso · A/E: Acción · MAP/DAY: Menú</div>
 `;
 container.appendChild(titleScreen);
 
@@ -247,16 +335,16 @@ starWarsScreen.innerHTML = `
       <h2>EL RETORNO DE LO MISMO</h2>
       <p>En un mundo atrapado en un bucle infinito de 7 días, el tiempo no avanza... sólo se repite.</p>
       <p>Friedrich Nietzsche planteó la pregunta definitiva: "¿Qué harías si un demonio te dijera que tendrás que vivir esta misma vida exactamente igual, una y otra vez por toda la eternidad?"</p>
-      <p>Aquí, el nivel y la fuerza física son una ilusión. El verdadero progreso es el CONOCIMIENTO adquirido en cada ciclo.</p>
-      <p>--- INSTRUCCIONES DE JUEGO ---</p>
-      <p>• WASD / FLECHAS: Muévete por la ciudad, bosque, catedral, mercado y biblioteca.</p>
-      <p>• TECLA E / ESPACIO: Interactúa con personajes y objetos (libros, altares, cofres, tumbas).</p>
-      <p>• TECLA T: Avanza el día. Cada día trae eventos filosóficos únicos. ¡El Día 5 llegará el Demonio!</p>
-      <p>• TECLA M: Abre el mapa para viaje rápido.</p>
-      <p>• TUS DECISIONES moldean 4 estadísticas: Voluntad (VOL), Nihilismo (NIH), Amor Fati (AMO) y Creación (CRE). Alcanza 80 en una para desbloquear 1 de los 5 finales filosóficos.</p>
+      <p>Aquí pondrás a prueba tu mente y tus reflejos con enigmas, pruebas de sincronización y esquiva de dudas oscuras.</p>
+      <p>--- CONTROLES Y DINÁMICA ---</p>
+      <p>• D-PAD / WASD: Movimiento ágil.</p>
+      <p>• BOTÓN DASH: ¡Impulso rápido para esquivar peligros!</p>
+      <p>• BOTÓN A / E: Interactuar y pulsar en Minijuegos.</p>
+      <p>• BOTÓN DÍA: Avanza el día hacia el Juicio del Demonio.</p>
+      <p>• BOTÓN MAPA: Viaje rápido entre zonas.</p>
     </div>
   </div>
-  <div class="skip-intro">Presiona ENTER o ESPACIO para saltar</div>
+  <div class="skip-intro" onclick="startGame()">Toca para saltar intro</div>
 `;
 container.appendChild(starWarsScreen);
 
@@ -264,6 +352,97 @@ const mapUi = document.createElement('div');
 mapUi.className = 'map-overlay';
 mapUi.id = 'map-ui';
 container.appendChild(mapUi);
+
+// --- Arcade Mobile Virtual Controls ---
+const mobileControls = document.createElement('div');
+mobileControls.className = 'mobile-controls';
+mobileControls.id = 'mobile-controls';
+mobileControls.innerHTML = `
+  <div class="top-mobile-bar">
+    <button class="pill-btn" id="m-btn-map">🗺️ MAPA</button>
+    <button class="pill-btn" id="m-btn-day">⏳ DÍA</button>
+  </div>
+  <div class="dpad-container">
+    <button class="arcade-btn dpad-btn dpad-up" id="m-up">▲</button>
+    <button class="arcade-btn dpad-btn dpad-down" id="m-down">▼</button>
+    <button class="arcade-btn dpad-btn dpad-left" id="m-left">◀</button>
+    <button class="arcade-btn dpad-btn dpad-right" id="m-right">▶</button>
+  </div>
+  <div class="action-buttons">
+    <button class="arcade-btn btn-action-dash" id="m-dash">DASH</button>
+    <button class="arcade-btn btn-action-b" id="m-btn-b">B</button>
+    <button class="arcade-btn btn-action-a" id="m-btn-a">A</button>
+  </div>
+  <div class="mobile-numpad" id="mobile-numpad">
+    <button class="num-btn" id="m-num-1">1</button>
+    <button class="num-btn" id="m-num-2">2</button>
+    <button class="num-btn" id="m-num-3">3</button>
+    <button class="num-btn" id="m-num-4">4</button>
+  </div>
+`;
+container.appendChild(mobileControls);
+
+// Helper function to bind virtual arcade buttons to keyboard events
+function setupMobileArcadeControls() {
+  const bindTouch = (id, keyName) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    
+    const triggerDown = (e) => {
+      e.preventDefault();
+      if (game.state === 'title') {
+        showIntro();
+        return;
+      } else if (game.state === 'intro') {
+        startGame();
+        return;
+      } else if (game.state === 'ending') {
+        restartGame();
+        return;
+      }
+
+      if (keys[keyName] !== undefined) {
+        keys[keyName] = 1;
+        handleKeyPress(keyName);
+      }
+      el.classList.add('active');
+    };
+
+    const triggerUp = (e) => {
+      e.preventDefault();
+      if (keys[keyName] !== undefined) keys[keyName] = 0;
+      el.classList.remove('active');
+    };
+
+    el.addEventListener('touchstart', triggerDown, { passive: false });
+    el.addEventListener('touchend', triggerUp, { passive: false });
+    el.addEventListener('mousedown', triggerDown);
+    el.addEventListener('mouseup', triggerUp);
+  };
+
+  bindTouch('m-up', 'ArrowUp');
+  bindTouch('m-down', 'ArrowDown');
+  bindTouch('m-left', 'ArrowLeft');
+  bindTouch('m-right', 'ArrowRight');
+  
+  bindTouch('m-btn-a', 'e');
+  bindTouch('m-btn-b', ' ');
+  bindTouch('m-dash', 'Shift');
+
+  bindTouch('m-btn-map', 'm');
+  bindTouch('m-btn-day', 't');
+
+  bindTouch('m-num-1', '1');
+  bindTouch('m-num-2', '2');
+  bindTouch('m-num-3', '3');
+  bindTouch('m-num-4', '4');
+
+  // Detect touch device to ensure visibility
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    mobileControls.style.display = 'block';
+  }
+}
+setTimeout(setupMobileArcadeControls, 100);
 
 // --- Constants & Data ---
 const TILE_SIZE = 16;
@@ -532,27 +711,34 @@ const dialogues = {
   panadero_day1: {
     speaker: 'Panadero',
     lines: [
-      { text: '¡Buenos días! El pan está recién hecho.' },
-      { text: 'El festival del primer día siempre me pone de buen humor.' },
-      { text: '¿Quieres un consejo? Disfruta estos momentos.' }
+      { text: '¡Buenos días! El pan está recién horneado y el fuego arde vivo.' },
+      { text: '¿Tienes agilidad en las manos? Podemos poner a prueba tus reflejos con los ingredientes.',
+        choices: [
+          { text: '¡Acepto el desafío de reflejos del horno! (Minijuego QTE)', action: () => startBakeryMinigame() },
+          { text: 'Solo pasaba a saludar.', next: null }
+        ]
+      }
     ]
   },
   panadero_day5: {
     speaker: 'Panadero',
     lines: [
-      { text: 'No... no me siento bien.' },
-      { text: 'Hay algo en el aire... algo oscuro.' },
-      { text: 'Si pudiera empezar de nuevo, haría las cosas diferente...' }
-    ],
-    effects: { nihilismo: 3 }
+      { text: 'No... no me siento bien. El horno se descontrola...' },
+      { text: 'Hay algo en el aire... algo oscuro.',
+        choices: [
+          { text: '¡Calmar el fuego desbocado! (Desafío de Reacción)', action: () => startBakeryMinigame() },
+          { text: 'Dejar que el destino siga su curso.', next: null, effects: { nihilismo: 3 } }
+        ]
+      }
+    ]
   },
   bibliotecaria: {
     speaker: 'Bibliotecaria',
     lines: [
-      { text: 'He dedicado mi vida a estos libros.' },
-      { text: 'Hay un texto antiguo que habla de un mundo que se repite...' },
-      { text: '"El eterno retorno de lo mismo", decía un filósofo.',
+      { text: 'He dedicado mi vida a ordenar estos manuscritos antiguos.' },
+      { text: 'Los pergaminos se mezclan en el eterno ciclo.',
         choices: [
+          { text: 'Descifrar el Enigma de los Libros (Minijuego Secuencia)', action: () => startLibraryMinigame() },
           { text: '¿Cómo se rompe el ciclo?', next: 'biblio_romper', effects: { creacion: 5 } },
           { text: 'Quizás repetir no es malo.', next: 'biblio_aceptar', effects: { amorFati: 10 } }
         ]
@@ -579,10 +765,10 @@ const dialogues = {
   sacerdote: {
     speaker: 'Sacerdote',
     lines: [
-      { text: 'La catedral ha estado aquí desde antes que la ciudad.' },
-      { text: 'La fe nos protege. Sin ella, ¿qué nos queda?' },
-      { text: 'He escuchado rumores sobre la Torre del Retorno...',
+      { text: 'La catedral resuena con campanadas ancestrales.' },
+      { text: 'Si logras sintonizar la melodía armónica del templo, la fe te revelará su poder.',
         choices: [
+          { text: 'Tocar el Campanario Sagrado (Minijuego Rítmico)', action: () => startCathedralMinigame() },
           { text: 'La fe es una ilusión necesaria.', next: 'sacerdote_ilusion', effects: { nihilismo: 5 } },
           { text: 'La fe tiene un poder real.', next: 'sacerdote_fe', effects: { voluntad: 5 } },
           { text: 'Háblame de la Torre.', next: 'sacerdote_torre', effects: { creacion: 3 } }
@@ -625,10 +811,10 @@ const dialogues = {
   mercader: {
     speaker: 'Mercader',
     lines: [
-      { text: 'Compra, vende, intercambia... eso es lo que hago.' },
-      { text: 'Pero aquí entre nos... el dinero no importa.' },
-      { text: 'Lo único que vale la pena acumular es conocimiento.',
+      { text: 'Compra, vende, intercambia... el mercado nunca descansa.' },
+      { text: 'Tengo gemas de conocimiento ocultas. Si tienes buenos reflejos, te daré una.',
         choices: [
+          { text: 'Desafiar al Mercader en el Mercado (Minijuego de Reacción)', action: () => startBakeryMinigame() },
           { text: '¿Qué sabes tú?', next: 'mercader_saber', effects: { creacion: 3 } },
           { text: 'El dinero tiene su poder.', next: 'mercader_dinero', effects: { nihilismo: 3 } }
         ]
@@ -656,11 +842,9 @@ const dialogues = {
     speaker: '???',
     lines: [
       { text: '...' },
-      { text: 'Tú también lo sientes, ¿verdad?' },
-      { text: 'El peso de haber estado aquí antes.' },
-      { text: 'Yo llevo contando los ciclos. Perdí la cuenta hace mucho.' },
-      { text: 'Pero tú... tú podrías ser diferente.',
+      { text: 'Has sobrevivido a muchos ciclos, pero ¿puedes atravesar la Niebla del Abismo en el Bosque?',
         choices: [
+          { text: '¡Entrar a la Prueba de Esquiva del Bosque! (Supervivencia 10s)', action: () => startForestTrial() },
           { text: '¿Quién eres?', next: 'misterioso_quien', effects: { creacion: 5, voluntad: 5 } },
           { text: '¿Cómo escapar?', next: 'misterioso_escapar', effects: { nihilismo: -5, amorFati: 5 } }
         ]
@@ -759,9 +943,10 @@ const dailyEvents = {
       lines: [
         { text: '¿Qué dirías si te dijera que esta vida, tal como la has vivido, tendrás que vivirla una vez más e innumerables veces más?' },
         { text: '¿Cuál es tu respuesta?', choices: [
-          { text: '¡Sí! ¡Nada más divino he escuchado!', next: null, effects: { amorFati: 20, voluntad: 10 } },
-          { text: 'Eso sería la peor maldición.', next: null, effects: { nihilismo: 15, voluntad: 5 } },
-          { text: '¿Y si pudiera cambiar algo?', next: null, effects: { creacion: 15, voluntad: 5 } }
+          { text: '¡Desafiar el Juicio del Demonio! (Duelo de Reacción & Voluntad)', action: () => startDemonTrial() },
+          { text: '¡Sí! ¡Nada más divino he escuchado! (Amor Fati)', next: null, effects: { amorFati: 20, voluntad: 10 } },
+          { text: 'Eso sería la peor maldición. (Nihilismo)', next: null, effects: { nihilismo: 15, voluntad: 5 } },
+          { text: '¿Y si pudiera cambiarlo todo creando nuevos valores? (Creación)', next: null, effects: { creacion: 15, voluntad: 5 } }
         ]}
       ]
     }
@@ -826,6 +1011,8 @@ const game = {
   state: 'title', // title, playing, dialog, transition, map, ending
   cycle: 1,
   day: 1,
+  dayTimer: 0,       // current progress in seconds for the day
+  dayDuration: 90.0, // 90 seconds per in-game day (Real-Time Day/Night cycle)
   currentMap: 'ciudad_central',
   player: {
     x: 9, y: 11,
@@ -852,11 +1039,13 @@ const game = {
   },
   shake: { intensity: 0, duration: 0, timer: 0 },
   ghosts: [],
-  glitch: 0
+  glitch: 0,
+  dashCooldown: 0,
+  minigame: null // { type: 'bakery'|'library'|'cathedral'|'forest'|'demon', ... }
 };
 
 // --- Input Handling ---
-const keys = { w:0, a:0, s:0, d:0, ArrowUp:0, ArrowDown:0, ArrowLeft:0, ArrowRight:0, e:0, ' ':0, t:0, m:0, Enter:0, Escape:0, 1:0, 2:0, 3:0 };
+const keys = { w:0, a:0, s:0, d:0, ArrowUp:0, ArrowDown:0, ArrowLeft:0, ArrowRight:0, e:0, ' ':0, t:0, m:0, Shift:0, Enter:0, Escape:0, 1:0, 2:0, 3:0, 4:0 };
 const pressed = {};
 
 window.addEventListener('keydown', e => {
@@ -875,6 +1064,55 @@ window.addEventListener('keyup', e => {
   }
 });
 
+function handleDash() {
+  if (game.state !== 'playing' || game.dashCooldown > 0) return;
+  
+  let dx = 0, dy = 0;
+  if (game.player.dir === 'up') dy = -2;
+  else if (game.player.dir === 'down') dy = 2;
+  else if (game.player.dir === 'left') dx = -2;
+  else if (game.player.dir === 'right') dx = 2;
+
+  let targetX = Math.round(game.player.x + dx);
+  let targetY = Math.round(game.player.y + dy);
+  
+  // Check half way and full way
+  let midX = Math.round(game.player.x + dx / 2);
+  let midY = Math.round(game.player.y + dy / 2);
+
+  let finalX = game.player.x;
+  let finalY = game.player.y;
+
+  if (getWalkable(targetX, targetY) && getWalkable(midX, midY)) {
+    finalX = targetX;
+    finalY = targetY;
+  } else if (getWalkable(midX, midY)) {
+    finalX = midX;
+    finalY = midY;
+  }
+
+  if (finalX !== game.player.x || finalY !== game.player.y) {
+    game.player.x = finalX;
+    game.player.y = finalY;
+    game.player.tx = finalX;
+    game.player.ty = finalY;
+    game.player.moving = false;
+    game.dashCooldown = 0.6;
+    window.AudioManager?.playDashSfx?.();
+    triggerShake(2, 0.15);
+
+    // Create dash ghosts
+    for (let i = 0; i < 4; i++) {
+      game.ghosts.push({
+        x: game.player.x - (dx * (i / 4)),
+        y: game.player.y - (dy * (i / 4)),
+        dir: game.player.dir,
+        frame: 0
+      });
+    }
+  }
+}
+
 function handleKeyPress(key) {
   if (game.state === 'title' && key === 'Enter') {
     showIntro();
@@ -884,14 +1122,18 @@ function handleKeyPress(key) {
     restartGame();
   } else if (game.state === 'playing') {
     if (key === 'e' || key === ' ') checkInteract();
+    if (key === 'Shift') handleDash();
     if (key === 't') advanceDay();
     if (key === 'm') toggleMap();
+  } else if (game.state === 'minigame') {
+    handleMinigameInput(key);
   } else if (game.state === 'dialog') {
     if (key === 'e' || key === ' ' || key === 'Enter') advanceDialog();
     if (game.dialog.choices) {
       if (key === '1' && game.dialog.choices.length >= 1) selectChoice(0);
       if (key === '2' && game.dialog.choices.length >= 2) selectChoice(1);
       if (key === '3' && game.dialog.choices.length >= 3) selectChoice(2);
+      if (key === '4' && game.dialog.choices.length >= 4) selectChoice(3);
     }
   } else if (game.state === 'map') {
     if (key === 'm' || key === 'Escape') toggleMap();
@@ -940,7 +1182,17 @@ function updateHUD() {
   document.getElementById('bar-amo').style.width = game.stats.amorFati + '%';
   document.getElementById('bar-cre').style.width = game.stats.creacion + '%';
   document.getElementById('cycle-display').innerText = 'Ciclo ' + game.cycle;
-  document.getElementById('day-display').innerText = 'Día ' + game.day;
+
+  // Calculate in-game hour from 06:00 to 24:00 (18 hours across 90s)
+  let dayRatio = Math.min(1.0, game.dayTimer / game.dayDuration);
+  let totalMinutes = Math.floor(6 * 60 + dayRatio * 18 * 60);
+  let hours = Math.floor(totalMinutes / 60) % 24;
+  let mins = Math.floor(totalMinutes % 60);
+  let timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+
+  document.getElementById('day-display').innerText = `Día ${game.day} · ${timeStr}`;
+  const bar = document.getElementById('day-progress');
+  if (bar) bar.style.width = (dayRatio * 100) + '%';
 }
 
 function showNotification(text) {
@@ -998,11 +1250,12 @@ function triggerEvent(day) {
 }
 
 function advanceDay() {
+  game.dayTimer = 0;
   game.day++;
   if (game.day > 7) {
     endCycle();
   } else {
-    showNotification('Día ' + game.day);
+    showNotification('Amanece el Día ' + game.day);
     updateHUD();
     updateNPCs();
     triggerEvent(game.day);
@@ -1379,10 +1632,353 @@ function changeMap(exit) {
   }, 800);
 }
 
+// --- MINIGAMES & ACTIVE PUZZLES SYSTEM ---
+
+function startBakeryMinigame() {
+  endDialog();
+  game.state = 'minigame';
+  window.AudioManager?.playNotification?.();
+  game.minigame = {
+    type: 'bakery',
+    title: 'DESAFÍO DEL HORNO & REFLEJOS',
+    instruction: '¡Presiona ESPACIO cuando la aguja esté en la ZONA DORADA!',
+    needle: 0,
+    needleSpeed: 2.2,
+    targetMin: 0.4,
+    targetMax: 0.6,
+    score: 0,
+    rounds: 3,
+    currentRound: 1,
+    state: 'active', // active, success, fail
+    timer: 0
+  };
+}
+
+function startLibraryMinigame() {
+  endDialog();
+  game.state = 'minigame';
+  window.AudioManager?.playNotification?.();
+  const numpad = document.getElementById('mobile-numpad');
+  if (numpad) numpad.style.display = 'flex';
+  const sequence = [
+    Math.floor(Math.random() * 4) + 1,
+    Math.floor(Math.random() * 4) + 1,
+    Math.floor(Math.random() * 4) + 1,
+    Math.floor(Math.random() * 4) + 1
+  ];
+  game.minigame = {
+    type: 'library',
+    title: 'ENIGMA DE LOS MANUSCRITOS ANTIGUOS',
+    instruction: 'Memoriza y reproduce la secuencia de runas usando los botones [1, 2, 3, 4]',
+    sequence: sequence,
+    playerInput: [],
+    showIndex: 0,
+    showTimer: 0,
+    phase: 'memorize', // memorize, input, success, fail
+    timer: 0
+  };
+}
+
+function startCathedralMinigame() {
+  endDialog();
+  game.state = 'minigame';
+  window.AudioManager?.playNotification?.();
+  const numpad = document.getElementById('mobile-numpad');
+  if (numpad) numpad.style.display = 'flex';
+  game.minigame = {
+    type: 'cathedral',
+    title: 'ARMONÍA DEL CAMPANARIO SAGRADO',
+    instruction: '¡Pulsa el botón de carril (1, 2, 3, 4) cuando la nota toque el círculo inferior!',
+    notes: [
+      { lane: 1, y: -20, speed: 80, hit: false },
+      { lane: 2, y: -70, speed: 80, hit: false },
+      { lane: 4, y: -120, speed: 80, hit: false },
+      { lane: 3, y: -170, speed: 80, hit: false },
+      { lane: 1, y: -220, speed: 80, hit: false }
+    ],
+    score: 0,
+    total: 5,
+    state: 'active',
+    timer: 0
+  };
+}
+
+function startForestTrial() {
+  endDialog();
+  game.state = 'minigame';
+  window.AudioManager?.playNotification?.();
+  game.minigame = {
+    type: 'forest',
+    title: 'NIEBLA DEL ABISMO: SUPERVIVENCIA',
+    instruction: '¡Esquiva los proyectiles de sombras oscuras! (Usa WASD y SHIFT para Dash)',
+    playerX: 160,
+    playerY: 120,
+    speed: 120,
+    orbs: [],
+    spawnTimer: 0,
+    surviveTime: 10.0,
+    elapsed: 0,
+    state: 'active'
+  };
+}
+
+function startDemonTrial() {
+  endDialog();
+  game.state = 'minigame';
+  window.AudioManager?.playNotification?.();
+  triggerShake(4, 0.5);
+  game.minigame = {
+    type: 'demon',
+    title: 'DUELO DE VOLUNTAD CON EL DEMONIO',
+    instruction: '¡Pulsa ESPACIO repetidamente y rápido para someter la Duda Eterna!',
+    power: 50, // 0 to 100, falls constantly
+    decayRate: 28,
+    pushPower: 9,
+    timeLeft: 8.0,
+    state: 'active'
+  };
+}
+
+function handleMinigameInput(key) {
+  if (!game.minigame) return;
+  const mg = game.minigame;
+
+  if (mg.type === 'bakery') {
+    if (key === ' ' || key === 'e' || key === 'Enter') {
+      if (mg.state === 'active') {
+        if (mg.needle >= mg.targetMin && mg.needle <= mg.targetMax) {
+          mg.score++;
+          window.AudioManager?.playMinigameSuccess?.();
+          showNotification('¡CORRECTO! +' + mg.score);
+          if (mg.currentRound >= mg.rounds) {
+            mg.state = 'success';
+            applyEffects({ amorFati: 10, creacion: 10 });
+            setTimeout(() => { 
+              game.state = 'playing'; 
+              game.minigame = null; 
+              const np = document.getElementById('mobile-numpad');
+              if (np) np.style.display = 'none';
+            }, 1500);
+          } else {
+            mg.currentRound++;
+            mg.needle = 0;
+            mg.targetMin = 0.3 + Math.random() * 0.3;
+            mg.targetMax = mg.targetMin + 0.2;
+            mg.needleSpeed += 0.5;
+          }
+        } else {
+          window.AudioManager?.playMinigameFail?.();
+          showNotification('¡Fallaste el punto!');
+          triggerShake(3, 0.2);
+          mg.state = 'fail';
+          setTimeout(() => { 
+            game.state = 'playing'; 
+            game.minigame = null; 
+            const np = document.getElementById('mobile-numpad');
+            if (np) np.style.display = 'none';
+          }, 1500);
+        }
+      }
+    }
+  } else if (mg.type === 'library') {
+    if (mg.phase === 'input') {
+      let num = parseInt(key);
+      if (num >= 1 && num <= 4) {
+        window.AudioManager?.playQteBeep?.(300 + num * 120);
+        mg.playerInput.push(num);
+        let currIdx = mg.playerInput.length - 1;
+        if (mg.playerInput[currIdx] !== mg.sequence[currIdx]) {
+          window.AudioManager?.playMinigameFail?.();
+          mg.phase = 'fail';
+          showNotification('¡Runa incorrecta!');
+          triggerShake(3, 0.2);
+          setTimeout(() => { 
+            game.state = 'playing'; 
+            game.minigame = null; 
+            const np = document.getElementById('mobile-numpad');
+            if (np) np.style.display = 'none';
+          }, 1500);
+        } else if (mg.playerInput.length === mg.sequence.length) {
+          window.AudioManager?.playMinigameSuccess?.();
+          mg.phase = 'success';
+          showNotification('¡Enigma Resuelto! CONOCIMIENTO +15');
+          applyEffects({ creacion: 15, voluntad: 8 });
+          setTimeout(() => { 
+            game.state = 'playing'; 
+            game.minigame = null; 
+            const np = document.getElementById('mobile-numpad');
+            if (np) np.style.display = 'none';
+          }, 1500);
+        }
+      }
+    }
+  } else if (mg.type === 'cathedral') {
+    let lane = parseInt(key);
+    if (lane >= 1 && lane <= 4 && mg.state === 'active') {
+      let hitNote = mg.notes.find(n => n.lane === lane && !n.hit && n.y >= 160 && n.y <= 210);
+      if (hitNote) {
+        hitNote.hit = true;
+        mg.score++;
+        window.AudioManager?.playQteBeep?.(440 + lane * 100);
+        triggerShake(1, 0.1);
+      } else {
+        window.AudioManager?.playQteBeep?.(200);
+      }
+    }
+  } else if (mg.type === 'demon') {
+    if ((key === ' ' || key === 'e' || key === 'Enter') && mg.state === 'active') {
+      mg.power = Math.min(100, mg.power + mg.pushPower);
+      window.AudioManager?.playQteBeep?.(400 + (mg.power * 4));
+      triggerShake(1.5, 0.08);
+    }
+  }
+}
+
+function updateMinigame(dt) {
+  if (!game.minigame) return;
+  const mg = game.minigame;
+
+  if (mg.type === 'bakery') {
+    if (mg.state === 'active') {
+      mg.needle += mg.needleSpeed * dt;
+      if (mg.needle > 1.0) {
+        mg.needle = 0;
+      }
+    }
+  } else if (mg.type === 'library') {
+    if (mg.phase === 'memorize') {
+      mg.showTimer += dt;
+      if (mg.showTimer >= 0.8) {
+        mg.showTimer = 0;
+        mg.showIndex++;
+        if (mg.showIndex < mg.sequence.length) {
+          window.AudioManager?.playQteBeep?.(300 + mg.sequence[mg.showIndex] * 120);
+        } else {
+          mg.phase = 'input';
+        }
+      }
+    }
+  } else if (mg.type === 'cathedral') {
+    if (mg.state === 'active') {
+      let allDone = true;
+      for (let n of mg.notes) {
+        n.y += n.speed * dt;
+        if (n.y < 230 && !n.hit) allDone = false;
+      }
+      if (allDone) {
+        if (mg.score >= 3) {
+          mg.state = 'success';
+          window.AudioManager?.playMinigameSuccess?.();
+          applyEffects({ voluntad: 12, amorFati: 10 });
+          showNotification('¡Campanadas perfectas!');
+        } else {
+          mg.state = 'fail';
+          window.AudioManager?.playMinigameFail?.();
+          showNotification('La melodía se disolvió...');
+        }
+        setTimeout(() => { 
+          game.state = 'playing'; 
+          game.minigame = null; 
+          const np = document.getElementById('mobile-numpad');
+          if (np) np.style.display = 'none';
+        }, 1500);
+      }
+    }
+  } else if (mg.type === 'forest') {
+    if (mg.state === 'active') {
+      mg.elapsed += dt;
+      mg.spawnTimer += dt;
+
+      // Move player inside minigame
+      let vx = 0, vy = 0;
+      if (keys.w || keys.ArrowUp) vy -= 1;
+      if (keys.s || keys.ArrowDown) vy += 1;
+      if (keys.a || keys.ArrowLeft) vx -= 1;
+      if (keys.d || keys.ArrowRight) vx += 1;
+      if (vx !== 0 || vy !== 0) {
+        let spd = mg.speed * (keys.Shift ? 1.8 : 1.0);
+        mg.playerX = Math.max(20, Math.min(300, mg.playerX + vx * spd * dt));
+        mg.playerY = Math.max(30, Math.min(210, mg.playerY + vy * spd * dt));
+      }
+
+      // Spawn orbs
+      if (mg.spawnTimer > 0.35) {
+        mg.spawnTimer = 0;
+        let side = Math.floor(Math.random() * 4);
+        let ox = side === 0 ? 0 : side === 1 ? 320 : Math.random() * 320;
+        let oy = side === 2 ? 0 : side === 3 ? 240 : Math.random() * 240;
+        let angle = Math.atan2(mg.playerY - oy, mg.playerX - ox) + (Math.random() - 0.5) * 0.4;
+        mg.orbs.push({
+          x: ox, y: oy,
+          vx: Math.cos(angle) * (80 + Math.random() * 60),
+          vy: Math.sin(angle) * (80 + Math.random() * 60)
+        });
+      }
+
+      // Update orbs and collision
+      for (let i = mg.orbs.length - 1; i >= 0; i--) {
+        let o = mg.orbs[i];
+        o.x += o.vx * dt;
+        o.y += o.vy * dt;
+        let dist = Math.hypot(o.x - mg.playerX, o.y - mg.playerY);
+        if (dist < 8) {
+          mg.state = 'fail';
+          window.AudioManager?.playMinigameFail?.();
+          triggerShake(5, 0.4);
+          showNotification('¡La sombra te alcanzó!');
+          setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+          return;
+        }
+        if (o.x < -20 || o.x > 340 || o.y < -20 || o.y > 260) {
+          mg.orbs.splice(i, 1);
+        }
+      }
+
+      if (mg.elapsed >= mg.surviveTime) {
+        mg.state = 'success';
+        window.AudioManager?.playMinigameSuccess?.();
+        applyEffects({ voluntad: 20, creacion: 10 });
+        showNotification('¡Supervivencia Lograda!');
+        setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+      }
+    }
+  } else if (mg.type === 'demon') {
+    if (mg.state === 'active') {
+      mg.timeLeft -= dt;
+      mg.power -= mg.decayRate * dt;
+
+      if (mg.power <= 0) {
+        mg.state = 'fail';
+        window.AudioManager?.playMinigameFail?.();
+        applyEffects({ nihilismo: 15 });
+        showNotification('La Duda Eterna te abrumó...');
+        setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+      } else if (mg.timeLeft <= 0) {
+        mg.state = 'success';
+        window.AudioManager?.playMinigameSuccess?.();
+        applyEffects({ voluntad: 25, amorFati: 15 });
+        showNotification('¡HAS DOMINADO AL DEMONIO!');
+        setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+      }
+    }
+  }
+}
+
 function update(dt) {
   game.time += dt;
+  if (game.dashCooldown > 0) game.dashCooldown -= dt;
 
-  if (game.state === 'playing') {
+  if (game.state === 'minigame') {
+    updateMinigame(dt);
+  } else if (game.state === 'playing') {
+    // Real-Time Day Progression (90 seconds per in-game day)
+    game.dayTimer += dt;
+    updateHUD();
+
+    if (game.dayTimer >= game.dayDuration) {
+      advanceDay();
+    }
+
     if (!game.player.moving) {
       let dx = 0, dy = 0;
       if (keys.w || keys.ArrowUp) { dy = -1; game.player.dir = 'up'; }
@@ -1693,12 +2289,31 @@ function render() {
   }
   ctx.globalAlpha = 1.0;
   
-  // Overlays (Day Cycle)
+  // Dynamic Day/Night Lighting Overlay (Continuous Real-Time Cycle)
+  let dayRatio = Math.min(1.0, game.dayTimer / game.dayDuration);
   let overlayColor = 'transparent';
-  if (game.day <= 2) overlayColor = 'rgba(255,200,100,0.05)';
-  else if (game.day === 5) overlayColor = 'rgba(200,50,50,0.08)';
-  else if (game.day === 6) overlayColor = 'rgba(30,30,100,0.15)';
-  else if (game.day === 7) overlayColor = 'rgba(80,20,100,0.15)';
+
+  // 0.0 - 0.2: Amanecer dorado suave (06:00 - 09:30)
+  // 0.2 - 0.6: Mediodía claro (09:30 - 16:45)
+  // 0.6 - 0.8: Atardecer rojizo / anaranjado (16:45 - 20:20)
+  // 0.8 - 1.0: Noche oscura azulada / violeta (20:20 - 24:00)
+  if (dayRatio < 0.2) {
+    let intensity = (1 - (dayRatio / 0.2)) * 0.18;
+    overlayColor = `rgba(251, 146, 60, ${intensity})`; // Warm morning orange
+  } else if (dayRatio >= 0.2 && dayRatio < 0.6) {
+    overlayColor = 'rgba(255, 255, 255, 0.02)'; // Crisp daylight
+  } else if (dayRatio >= 0.6 && dayRatio < 0.8) {
+    let t = (dayRatio - 0.6) / 0.2;
+    overlayColor = `rgba(225, 29, 72, ${0.08 + t * 0.16})`; // Sunset crimson/purple
+  } else {
+    let t = (dayRatio - 0.8) / 0.2;
+    overlayColor = `rgba(15, 23, 42, ${0.24 + t * 0.22})`; // Deep night blue
+  }
+
+  // Day 5 special eerie hue modifier
+  if (game.day === 5) {
+    overlayColor = `rgba(180, 20, 20, ${0.12 + Math.sin(game.time * 3) * 0.04})`;
+  }
   
   if (overlayColor !== 'transparent') {
     ctx.fillStyle = overlayColor;
@@ -1723,6 +2338,216 @@ function render() {
     let tx = (Math.random() - 0.5) * 8;
     ctx.drawImage(canvas, 0, ty, canvas.width, th, tx, ty, canvas.width, th);
   }
+
+  // Draw Minigame Overlay if active
+  if (game.state === 'minigame' && game.minigame) {
+    renderMinigame();
+  }
+}
+
+function renderMinigame() {
+  const mg = game.minigame;
+  ctx.save();
+
+  // Backdrop
+  ctx.fillStyle = 'rgba(8, 8, 18, 0.94)';
+  ctx.fillRect(10, 10, canvas.width - 20, canvas.height - 20);
+  ctx.strokeStyle = '#d4a843';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+  // Title & Instructions
+  ctx.font = '7px "Press Start 2P", monospace';
+  ctx.fillStyle = '#f0d78c';
+  ctx.textAlign = 'center';
+  ctx.fillText(mg.title, canvas.width / 2, 28);
+
+  ctx.font = '5px "Press Start 2P", monospace';
+  ctx.fillStyle = '#bbb';
+  ctx.fillText(mg.instruction, canvas.width / 2, 42);
+
+  if (mg.type === 'bakery') {
+    // Round display
+    ctx.fillStyle = '#a78bfa';
+    ctx.fillText(`Ronda ${mg.currentRound} / ${mg.rounds} (Aciertos: ${mg.score})`, canvas.width / 2, 60);
+
+    // Bar background
+    let barX = 40;
+    let barY = 110;
+    let barW = 240;
+    let barH = 24;
+
+    ctx.fillStyle = '#222';
+    ctx.fillRect(barX, barY, barW, barH);
+
+    // Target Sweet Spot
+    let targetX = barX + mg.targetMin * barW;
+    let targetW = (mg.targetMax - mg.targetMin) * barW;
+    ctx.fillStyle = '#d4a843';
+    ctx.fillRect(targetX, barY, targetW, barH);
+    ctx.strokeStyle = '#fff';
+    ctx.strokeRect(targetX, barY, targetW, barH);
+
+    // Needle
+    let needleX = barX + mg.needle * barW;
+    ctx.fillStyle = '#ef4444';
+    ctx.fillRect(needleX - 2, barY - 6, 4, barH + 12);
+
+    // Helper text
+    ctx.font = '6px "Press Start 2P", monospace';
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillText('¡PULSA ESPACIO / E AHORA!', canvas.width / 2, 170);
+
+  } else if (mg.type === 'library') {
+    let colors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
+    let symbols = ['I', 'II', 'III', 'IV'];
+
+    if (mg.phase === 'memorize') {
+      ctx.fillStyle = '#a78bfa';
+      ctx.fillText('MEMORIZA LA SECUENCIA...', canvas.width / 2, 70);
+
+      for (let i = 0; i < mg.sequence.length; i++) {
+        let rx = 55 + i * 55;
+        let ry = 100;
+        let active = (i === mg.showIndex);
+        ctx.fillStyle = active ? colors[mg.sequence[i] - 1] : '#222';
+        ctx.fillRect(rx, ry, 45, 45);
+        ctx.strokeStyle = active ? '#fff' : '#444';
+        ctx.strokeRect(rx, ry, 45, 45);
+
+        ctx.fillStyle = active ? '#fff' : '#666';
+        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.fillText(active ? symbols[mg.sequence[i] - 1] : '?', rx + 22, ry + 28);
+      }
+    } else {
+      ctx.fillStyle = '#10b981';
+      ctx.fillText('¡TU TURNO! PULSA TECLAS [1, 2, 3, 4]', canvas.width / 2, 70);
+
+      for (let i = 0; i < 4; i++) {
+        let rx = 55 + i * 55;
+        let ry = 100;
+        let pressedByPlayer = (mg.playerInput[i] !== undefined);
+        let val = mg.playerInput[i];
+        ctx.fillStyle = pressedByPlayer ? colors[val - 1] : '#222';
+        ctx.fillRect(rx, ry, 45, 45);
+        ctx.strokeStyle = pressedByPlayer ? '#fff' : '#555';
+        ctx.strokeRect(rx, ry, 45, 45);
+
+        ctx.fillStyle = '#fff';
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.fillText(pressedByPlayer ? symbols[val - 1] : `[${i+1}]`, rx + 22, ry + 28);
+      }
+    }
+  } else if (mg.type === 'cathedral') {
+    // 4 Lanes
+    let startX = 60;
+    let laneW = 50;
+    let hitLineY = 180;
+
+    for (let i = 0; i < 4; i++) {
+      let lx = startX + i * laneW;
+      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+      ctx.strokeRect(lx, 55, laneW, 145);
+
+      // Hit Target Circle
+      ctx.beginPath();
+      ctx.arc(lx + laneW / 2, hitLineY, 12, 0, Math.PI * 2);
+      ctx.strokeStyle = '#d4a843';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#d4a843';
+      ctx.font = '7px "Press Start 2P", monospace';
+      ctx.fillText(`[${i+1}]`, lx + laneW / 2, hitLineY + 3);
+    }
+
+    // Notes
+    for (let n of mg.notes) {
+      if (!n.hit && n.y > 40 && n.y < 210) {
+        let nx = startX + (n.lane - 1) * laneW + laneW / 2;
+        ctx.beginPath();
+        ctx.arc(nx, n.y, 9, 0, Math.PI * 2);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+      }
+    }
+  } else if (mg.type === 'forest') {
+    // Arena frame
+    ctx.strokeStyle = '#4a2a18';
+    ctx.strokeRect(20, 50, 280, 160);
+
+    // Timer & Status
+    let remain = Math.max(0, mg.surviveTime - mg.elapsed).toFixed(1);
+    ctx.fillStyle = '#a3e635';
+    ctx.font = '6px "Press Start 2P", monospace';
+    ctx.fillText(`TIEMPO RESTANTE: ${remain}s (Usa SHIFT para Dash)`, canvas.width / 2, 62);
+
+    // Draw Orbs
+    for (let o of mg.orbs) {
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#ef4444';
+      ctx.shadowColor = '#f87171';
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // Draw Player dot in minigame
+    drawCharacter(mg.playerX / TILE_SIZE - 0.5, mg.playerY / TILE_SIZE - 0.5, '#fff', '#f5d5b5', '#8b5cf6', 'down', 0, true);
+
+  } else if (mg.type === 'demon') {
+    let remain = Math.max(0, mg.timeLeft).toFixed(1);
+    ctx.fillStyle = '#f87171';
+    ctx.font = '7px "Press Start 2P", monospace';
+    ctx.fillText(`TIEMPO: ${remain}s`, canvas.width / 2, 60);
+
+    // Power Tug of War Bar
+    let bx = 50, by = 100, bw = 220, bh = 24;
+    ctx.fillStyle = '#1e1b4b';
+    ctx.fillRect(bx, by, bw, bh);
+
+    let fillW = (mg.power / 100) * bw;
+    let grad = ctx.createLinearGradient(bx, by, bx + bw, by);
+    grad.addColorStop(0, '#ef4444');
+    grad.addColorStop(0.5, '#d4a843');
+    grad.addColorStop(1, '#8b5cf6');
+    ctx.fillStyle = grad;
+    ctx.fillRect(bx, by, fillW, bh);
+
+    ctx.strokeStyle = '#fff';
+    ctx.strokeRect(bx, by, bw, bh);
+
+    // Center indicator
+    ctx.strokeStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(bx + bw / 2, by - 4);
+    ctx.lineTo(bx + bw / 2, by + bh + 4);
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = '6px "Press Start 2P", monospace';
+    ctx.fillText('¡MACHACA ESPACIO RÁPIDAMENTE!', canvas.width / 2, 160);
+  }
+
+  // Result overlay
+  if (mg.state === 'success' || mg.phase === 'success') {
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.4)';
+    ctx.fillRect(10, 10, canvas.width - 20, canvas.height - 20);
+    ctx.fillStyle = '#fff';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText('¡VICTORIA!', canvas.width / 2, canvas.height / 2);
+  } else if (mg.state === 'fail' || mg.phase === 'fail') {
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+    ctx.fillRect(10, 10, canvas.width - 20, canvas.height - 20);
+    ctx.fillStyle = '#fff';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText('¡DESAFÍO FALLIDO!', canvas.width / 2, canvas.height / 2);
+  }
+
+  ctx.restore();
 }
 
 // --- Main Loop ---

@@ -410,6 +410,39 @@ class AudioManager {
     }
 
     /**
+     * Efectos de sonido para Minijuegos y QTEs
+     */
+    playMinigameSuccess() {
+        if (!this.ctx) return;
+        this.playNote(523.25, 0.1, 'triangle', 0.15, 0);
+        this.playNote(659.25, 0.1, 'triangle', 0.15, 0.08);
+        this.playNote(783.99, 0.25, 'triangle', 0.18, 0.16);
+    }
+
+    playMinigameFail() {
+        if (!this.ctx) return;
+        this.playNote(220, 0.15, 'sawtooth', 0.15, 0);
+        this.playNote(164.81, 0.3, 'sawtooth', 0.2, 0.12);
+    }
+
+    playQteBeep(pitch = 440) {
+        if (!this.ctx) return;
+        this.playNote(pitch, 0.08, 'square', 0.1, 0);
+    }
+
+    playDashSfx() {
+        if (!this.ctx) return;
+        this.playNoise(0.12, 0.08);
+        this.playNote(300, 0.1, 'sine', 0.1, 0);
+    }
+
+    playItemCollect() {
+        if (!this.ctx) return;
+        this.playNote(880, 0.08, 'triangle', 0.15, 0);
+        this.playNote(1318.51, 0.18, 'triangle', 0.15, 0.06);
+    }
+
+    /**
      * Sonidos para los diferentes finales del juego
      */
     playEnding(type) {
