@@ -40,6 +40,8 @@ Alcanzar 80 puntos en alguna estadística (o el equilibrio entre todas) desbloqu
 - 📜 **Biblioteca (Enigma de Runas Antiguas)**: Pon a prueba tu memoria reproduciendo secuencias de runas numéricas `[1, 2, 3, 4]`.
 - 🔔 **Catedral (Armonía del Campanario Sagrado)**: Minijuego rítmico de 4 carriles donde tocas las notas celestiales al compás.
 - 🌲 **Bosque (Niebla del Abismo - Supervivencia 10s)**: Esquiva proyectiles de sombras oscuras usando tus reflejos y el Dash.
+- 🏔️ **Cima de la Montaña (Equilibrio del Superhombre)**: Mantén el equilibrio en la cornisa sorteando las ráfagas de viento con `[A]/[D]`.
+- 💀 **Catacumbas del Abismo (Purificación Contrarreloj)**: Recolecta los 6 orbes de luz en el laberinto subterráneo antes de que se extinga el tiempo.
 - 😈 **Día 5 (Duelo de Voluntad con el Demonio)**: Desafío de resistencia y velocidad (*Tug of War*) machacando la tecla de acción para someter la Duda Eterna.
 
 ### 📱 4. Soporte para Dispositivos Móviles (Controles Arcade Táctiles)
@@ -50,17 +52,19 @@ Alcanzar 80 puntos en alguna estadística (o el equilibrio entre todas) desbloqu
 
 ### 🎵 5. Audio 100% Procedural (Web Audio API)
 - No requiere archivos de audio externos (`.mp3` o `.wav`).
-- Genera pistas ambientales con osciladores, envolventes ADSR y efectos de sonido dinámicos (pasos, campanas, dash, runas, fanfarrias y finales únicos).
+- Genera pistas ambientales con osciladores, envolventes ADSR y efectos de sonido dinámicos (pasos, campanas, dash, runas, viento de montaña, ecos cavernosos y fanfarrias).
 
 ---
 
-## 🗺️ Zonas del Mundo
+## 🗺️ Zonas del Mundo (7 Escenarios)
 
 1. **Ciudad Central**: La plaza del pueblo con fuentes, estatuas y el Guardián.
 2. **Mercado**: Puestos de mercaderes, panadería y gran actividad comercial.
 3. **Biblioteca**: Estanterías ancestrales con citas reales de Nietzsche y manuscritos ocultos.
 4. **Catedral**: Templo silencioso con columnas, altares de sacrificio de estadísticas y campanario.
 5. **Bosque Profundo**: Niebla misteriosa, tumbas y presencias enigmáticas tras varios ciclos.
+6. **Cima de la Montaña**: Cumbre ventosa con el Ermitaño y la prueba de equilibrio del Superhombre.
+7. **Catacumbas del Abismo**: Caverna ancestral con la Sombra del Pasado y la prueba de purificación.
 
 ---
 

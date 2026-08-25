@@ -249,6 +249,19 @@ class AudioManager {
                 lfo.start();
                 this.ambientNodes.push({ source: lfo });
                 break;
+
+            case 'montana':
+                // Viento frío de gran altitud y resonancia solitaria
+                addNoise('bandpass', 600, 2, 0.05);
+                addNoise('lowpass', 200, 1, 0.04);
+                addOscillator(150, 'triangle', 0.02, 0.05, 0.01);
+                break;
+
+            case 'catacumbas':
+                // Ecos de caverna profunda y gotas cavernosas
+                addOscillator(55, 'sawtooth', 0.03);
+                addNoise('lowpass', 100, 3, 0.06);
+                break;
         }
     }
 
