@@ -126,7 +126,7 @@ style.innerHTML = `
     box-sizing: border-box; font-family: 'Press Start 2P', monospace; border-radius: 4px;
   }
   .map-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
     gap: 10px; width: 100%; flex: 1; margin-top: 16px;
   }
   .map-node {
@@ -601,6 +601,40 @@ const mapStrings = {
     "CgpTggppppGpppTgggpT",
     "TgpCggCgCggCgCggCgpC",
     "CTCTCTCTCTCTCTCTCTCT"
+  ],
+  montana: [
+    "WWWWWWWWWWWWWWWWWWWW",
+    "WddddddddddddddddddW",
+    "WddssssssssssssssddW",
+    "WdssttssssttssssttsW",
+    "WdssssssssssssssssdW",
+    "WdssssspppppssssssdW",
+    "WdsssppAAAAAppssssdW",
+    "WdsssppAAAAAppssssdW",
+    "WdssssspppppssssssdW",
+    "WdssssssssssssssssdW",
+    "WdssttssssttssssttsW",
+    "WddssssssssssssssddW",
+    "WddddddddddddddddddW",
+    "WddddddddEEddddddddW",
+    "WWWWWWWWWWWWWWWWWWWW"
+  ],
+  catacumbas: [
+    "WWWWWWWWWWWWWWWWWWWW",
+    "WssssssssEEssssssssW",
+    "WsWWWssWWssWWssWWWsW",
+    "WsWGGssGGssGGssGGWsW",
+    "WsttsssttsssttsssttW",
+    "WssssssccccccssssssW",
+    "WssGGssccccccssGGssW",
+    "WsWWWssccccccssWWWsW",
+    "WssGGssccccccssGGssW",
+    "WssssssccccccssssssW",
+    "WsttsssttsssttsssttW",
+    "WsWGGssGGssGGssGGWsW",
+    "WsWWWssWWssWWssWWWsW",
+    "WssssssssssssssssssW",
+    "WWWWWWWWWWWWWWWWWWWW"
   ]
 };
 
@@ -616,8 +650,8 @@ const maps = {
       // Top buildings exits
       { x: 4, y: 2, target: 'catedral', sx: 9, sy: 12 },
       { x: 5, y: 2, target: 'catedral', sx: 10, sy: 12 },
-      { x: 13, y: 2, target: 'catedral', sx: 9, sy: 12 },
-      { x: 14, y: 2, target: 'catedral', sx: 10, sy: 12 }
+      { x: 13, y: 2, target: 'montana', sx: 9, sy: 12 },
+      { x: 14, y: 2, target: 'montana', sx: 10, sy: 12 }
     ],
     npcs: [
       { id: 'guardian', name: 'Guardián', x: 7, y: 9, h: '#666', s: '#e0c0a0', c: '#4a5a8a', d: 'guardian_intro' },
@@ -650,7 +684,9 @@ const maps = {
     name: 'Catedral',
     exits: [
       { x: 9, y: 13, target: 'ciudad_central', sx: 4, sy: 3 },
-      { x: 10, y: 13, target: 'ciudad_central', sx: 5, sy: 3 }
+      { x: 10, y: 13, target: 'ciudad_central', sx: 5, sy: 3 },
+      { x: 1, y: 1, target: 'catacumbas', sx: 9, sy: 2 },
+      { x: 18, y: 1, target: 'catacumbas', sx: 10, sy: 2 }
     ],
     npcs: [
       { id: 'sacerdote', name: 'Sacerdote', x: 9, y: 3, h: '#555', s: '#e0c0a0', c: '#2a2a2a', d: 'sacerdote' }
@@ -665,6 +701,28 @@ const maps = {
     ],
     npcs: [
       { id: 'misterioso', name: '???', x: 13, y: 12, h: '#222', s: '#aaa', c: '#1a1a2a', d: 'misterioso', cond: (g) => g.cycle > 3 }
+    ]
+  },
+  montana: {
+    tiles: buildMap(mapStrings.montana),
+    name: 'Cima de la Montaña',
+    exits: [
+      { x: 9, y: 13, target: 'ciudad_central', sx: 13, sy: 3 },
+      { x: 10, y: 13, target: 'ciudad_central', sx: 14, sy: 3 }
+    ],
+    npcs: [
+      { id: 'ermitano', name: 'Ermitaño de la Cima', x: 10, y: 5, h: '#fff', s: '#e0c0a0', c: '#d4a843', d: 'ermitano' }
+    ]
+  },
+  catacumbas: {
+    tiles: buildMap(mapStrings.catacumbas),
+    name: 'Catacumbas del Abismo',
+    exits: [
+      { x: 9, y: 1, target: 'catedral', sx: 9, sy: 12 },
+      { x: 10, y: 1, target: 'catedral', sx: 10, sy: 12 }
+    ],
+    npcs: [
+      { id: 'sombra_abismo', name: 'Sombra del Pasado', x: 10, y: 9, h: '#000', s: '#555', c: '#111', d: 'sombra_abismo' }
     ]
   }
 };
@@ -867,6 +925,48 @@ const dialogues = {
       { text: '¿Podrías vivir este mismo ciclo, eternamente, y ser feliz?' },
       { text: 'Esa es la verdadera pregunta.' }
     ]
+  },
+  ermitano: {
+    speaker: 'Ermitaño de la Cima',
+    lines: [
+      { text: 'La cumbre es el lugar de los espíritus libres. Aquí el aire es puro y el abismo queda abajo.' },
+      { text: 'El puente hacia el Superhombre exige temple. ¿Te atreves a equilibrar tu espíritu en la cornisa?',
+        choices: [
+          { text: '¡Acepto la Prueba del Equilibrio del Superhombre! (Minijuego de Precisión)', action: () => startMountainTrial() },
+          { text: '¿Qué se siente estar tan alto?', next: 'ermitano_filosofia', effects: { creacion: 5 } },
+          { text: 'Solo observo el horizonte.', next: null, effects: { amorFati: 5 } }
+        ]
+      }
+    ]
+  },
+  ermitano_filosofia: {
+    speaker: 'Ermitaño de la Cima',
+    lines: [
+      { text: '"Grandeza en el hombre es ser un puente y no una meta."' },
+      { text: 'No busques descanso en la cima: busca la fuerza para volver a descender y amar la tierra.' }
+    ],
+    effects: { voluntad: 10 }
+  },
+  sombra_abismo: {
+    speaker: 'Sombra del Pasado',
+    lines: [
+      { text: 'Las catacumbas guardan los ecos de todos tus fracasos en ciclos olvidados.' },
+      { text: '¿Crees que puedes purificar los fragmentos perdidos antes de que la nada te consuma?',
+        choices: [
+          { text: '¡Entrar al Laberinto de Sombras! (Minijuego de Recolección Contrarreloj)', action: () => startCatacombsTrial() },
+          { text: 'La nada no me asusta.', next: 'sombra_nada', effects: { nihilismo: 8 } },
+          { text: 'Retirarme hacia la luz de la Catedral.', next: null }
+        ]
+      }
+    ]
+  },
+  sombra_nada: {
+    speaker: 'Sombra del Pasado',
+    lines: [
+      { text: 'Quien con monstruos lucha cuide de no convertirse a su vez en monstruo...' },
+      { text: 'Cuando miras largo tiempo a un abismo, el abismo también mira dentro de ti.' }
+    ],
+    effects: { nihilismo: 5, voluntad: 5 }
   }
 };
 
@@ -1550,18 +1650,21 @@ window.selectChoice = function(idx) {
   if (choice.effects) applyEffects(choice.effects);
   if (choice.action) choice.action();
   
-  if (choice.next) {
-    let original = dialogues[choice.next];
-    game.dialog.current = {
-      speaker: original.speaker,
-      effects: original.effects,
-      lines: [...original.lines]
-    };
-    game.dialog.line = 0;
-    game.dialog.char = 0;
-    document.getElementById('d-choices').innerHTML = '';
-  } else {
-    endDialog();
+  // If choice started a minigame, game.state is already 'minigame', so do not force endDialog back to 'playing'
+  if (game.state === 'dialog') {
+    if (choice.next) {
+      let original = dialogues[choice.next];
+      game.dialog.current = {
+        speaker: original.speaker,
+        effects: original.effects,
+        lines: [...original.lines]
+      };
+      game.dialog.line = 0;
+      game.dialog.char = 0;
+      document.getElementById('d-choices').innerHTML = '';
+    } else {
+      endDialog();
+    }
   }
 };
 
@@ -1635,7 +1738,8 @@ function changeMap(exit) {
 // --- MINIGAMES & ACTIVE PUZZLES SYSTEM ---
 
 function startBakeryMinigame() {
-  endDialog();
+  dialogBox.style.display = 'none';
+  game.dialog.active = false;
   game.state = 'minigame';
   window.AudioManager?.playNotification?.();
   game.minigame = {
@@ -1655,7 +1759,8 @@ function startBakeryMinigame() {
 }
 
 function startLibraryMinigame() {
-  endDialog();
+  dialogBox.style.display = 'none';
+  game.dialog.active = false;
   game.state = 'minigame';
   window.AudioManager?.playNotification?.();
   const numpad = document.getElementById('mobile-numpad');
@@ -1680,7 +1785,8 @@ function startLibraryMinigame() {
 }
 
 function startCathedralMinigame() {
-  endDialog();
+  dialogBox.style.display = 'none';
+  game.dialog.active = false;
   game.state = 'minigame';
   window.AudioManager?.playNotification?.();
   const numpad = document.getElementById('mobile-numpad');
@@ -1704,7 +1810,8 @@ function startCathedralMinigame() {
 }
 
 function startForestTrial() {
-  endDialog();
+  dialogBox.style.display = 'none';
+  game.dialog.active = false;
   game.state = 'minigame';
   window.AudioManager?.playNotification?.();
   game.minigame = {
@@ -1723,7 +1830,8 @@ function startForestTrial() {
 }
 
 function startDemonTrial() {
-  endDialog();
+  dialogBox.style.display = 'none';
+  game.dialog.active = false;
   game.state = 'minigame';
   window.AudioManager?.playNotification?.();
   triggerShake(4, 0.5);
@@ -1735,6 +1843,51 @@ function startDemonTrial() {
     decayRate: 28,
     pushPower: 9,
     timeLeft: 8.0,
+    state: 'active'
+  };
+}
+
+function startMountainTrial() {
+  dialogBox.style.display = 'none';
+  game.dialog.active = false;
+  game.state = 'minigame';
+  window.AudioManager?.playNotification?.();
+  game.minigame = {
+    type: 'mountain',
+    title: 'EQUILIBRIO EN LA CORNISA DEL SUPERHOMBRE',
+    instruction: '¡Usa [A]/[D] o Flechas Izq/Der para mantener el peso en el centro!',
+    balance: 0.0, // -1.0 to 1.0
+    windForce: 0,
+    windTimer: 0,
+    surviveTime: 12.0,
+    elapsed: 0,
+    state: 'active'
+  };
+}
+
+function startCatacombsTrial() {
+  dialogBox.style.display = 'none';
+  game.dialog.active = false;
+  game.state = 'minigame';
+  window.AudioManager?.playNotification?.();
+  const orbs = [];
+  for (let i = 0; i < 6; i++) {
+    orbs.push({
+      x: 40 + Math.random() * 240,
+      y: 70 + Math.random() * 120,
+      collected: false
+    });
+  }
+  game.minigame = {
+    type: 'catacombs',
+    title: 'PURIFICACIÓN EN LAS CATACUMBAS',
+    instruction: '¡Recoge los 6 orbes de luz antes de que acabe el tiempo! (WASD / D-Pad + SHIFT)',
+    playerX: 160,
+    playerY: 130,
+    speed: 125,
+    orbs: orbs,
+    collectedCount: 0,
+    timeLeft: 12.0,
     state: 'active'
   };
 }
@@ -1958,6 +2111,81 @@ function updateMinigame(dt) {
         window.AudioManager?.playMinigameSuccess?.();
         applyEffects({ voluntad: 25, amorFati: 15 });
         showNotification('¡HAS DOMINADO AL DEMONIO!');
+        setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+      }
+    }
+  } else if (mg.type === 'mountain') {
+    if (mg.state === 'active') {
+      mg.elapsed += dt;
+      mg.windTimer += dt;
+      
+      // Wind pushes balance randomly
+      if (mg.windTimer > 0.8) {
+        mg.windTimer = 0;
+        mg.windForce = (Math.random() - 0.5) * 1.6;
+      }
+      
+      // Player controls
+      let move = 0;
+      if (keys.a || keys.ArrowLeft) move -= 1.8 * dt;
+      if (keys.d || keys.ArrowRight) move += 1.8 * dt;
+      
+      mg.balance += (mg.windForce * dt * 0.9) + move;
+
+      if (Math.abs(mg.balance) >= 1.0) {
+        mg.state = 'fail';
+        window.AudioManager?.playMinigameFail?.();
+        triggerShake(5, 0.4);
+        showNotification('¡Perdiste el equilibrio en la cornisa!');
+        setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+      } else if (mg.elapsed >= mg.surviveTime) {
+        mg.state = 'success';
+        window.AudioManager?.playMinigameSuccess?.();
+        applyEffects({ voluntad: 25, creacion: 15 });
+        showNotification('¡TEMPLE DEL SUPERHOMBRE ALCANZADO!');
+        setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+      }
+    }
+  } else if (mg.type === 'catacombs') {
+    if (mg.state === 'active') {
+      mg.timeLeft -= dt;
+
+      // Move player inside minigame arena
+      let vx = 0, vy = 0;
+      if (keys.w || keys.ArrowUp) vy -= 1;
+      if (keys.s || keys.ArrowDown) vy += 1;
+      if (keys.a || keys.ArrowLeft) vx -= 1;
+      if (keys.d || keys.ArrowRight) vx += 1;
+      if (vx !== 0 || vy !== 0) {
+        let spd = mg.speed * (keys.Shift ? 1.7 : 1.0);
+        mg.playerX = Math.max(30, Math.min(290, mg.playerX + vx * spd * dt));
+        mg.playerY = Math.max(65, Math.min(200, mg.playerY + vy * spd * dt));
+      }
+
+      // Check collision with orbs
+      for (let o of mg.orbs) {
+        if (!o.collected) {
+          let dist = Math.hypot(o.x - mg.playerX, o.y - mg.playerY);
+          if (dist < 14) {
+            o.collected = true;
+            mg.collectedCount++;
+            window.AudioManager?.playItemCollect?.();
+            triggerShake(1, 0.1);
+          }
+        }
+      }
+
+      if (mg.collectedCount >= mg.orbs.length) {
+        mg.state = 'success';
+        window.AudioManager?.playMinigameSuccess?.();
+        applyEffects({ voluntad: 15, amorFati: 15 });
+        showNotification('¡CATACUMBAS PURIFICADAS!');
+        setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
+      } else if (mg.timeLeft <= 0) {
+        mg.state = 'fail';
+        window.AudioManager?.playMinigameFail?.();
+        applyEffects({ nihilismo: 10 });
+        showNotification('La oscuridad consumió el tiempo...');
         setTimeout(() => { game.state = 'playing'; game.minigame = null; }, 1500);
       }
     }
@@ -2530,6 +2758,72 @@ function renderMinigame() {
     ctx.fillStyle = '#fff';
     ctx.font = '6px "Press Start 2P", monospace';
     ctx.fillText('¡MACHACA ESPACIO RÁPIDAMENTE!', canvas.width / 2, 160);
+  } else if (mg.type === 'mountain') {
+    let remain = Math.max(0, mg.surviveTime - mg.elapsed).toFixed(1);
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = '6px "Press Start 2P", monospace';
+    ctx.fillText(`TIEMPO EN LA CORNISA: ${remain}s`, canvas.width / 2, 60);
+
+    // Balance Beam & Cornisa
+    let beamX = 40, beamY = 120, beamW = 240, beamH = 14;
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(beamX, beamY, beamW, beamH);
+    ctx.strokeStyle = '#94a3b8';
+    ctx.strokeRect(beamX, beamY, beamW, beamH);
+
+    // Safe Center Zone
+    let safeW = 80;
+    ctx.fillStyle = 'rgba(16, 185, 129, 0.3)';
+    ctx.fillRect(canvas.width / 2 - safeW / 2, beamY, safeW, beamH);
+
+    // Danger Edges
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+    ctx.fillRect(beamX, beamY, 30, beamH);
+    ctx.fillRect(beamX + beamW - 30, beamY, 30, beamH);
+
+    // Player Balance Marker
+    let markerX = canvas.width / 2 + (mg.balance * (beamW / 2 - 12));
+    ctx.fillStyle = '#d4a843';
+    ctx.beginPath();
+    ctx.arc(markerX, beamY + beamH / 2, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.stroke();
+
+    // Wind indicator
+    ctx.fillStyle = '#67e8f9';
+    ctx.font = '6px "Press Start 2P", monospace';
+    let windStr = mg.windForce > 0.2 ? '>>> VIENTO DERECHA >>>' : (mg.windForce < -0.2 ? '<<< VIENTO IZQUIERDA <<<' : '--- CALMA ---');
+    ctx.fillText(windStr, canvas.width / 2, 160);
+    ctx.fillText('¡Usa [A]/[D] o Flechas para equilibrarte!', canvas.width / 2, 180);
+
+  } else if (mg.type === 'catacombs') {
+    let remain = Math.max(0, mg.timeLeft).toFixed(1);
+    ctx.fillStyle = '#a855f7';
+    ctx.font = '6px "Press Start 2P", monospace';
+    ctx.fillText(`TIEMPO: ${remain}s · ORBES: ${mg.collectedCount} / ${mg.orbs.length}`, canvas.width / 2, 58);
+
+    // Arena boundary
+    ctx.strokeStyle = '#4c1d95';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(25, 65, 270, 140);
+
+    // Draw Light Orbs
+    for (let o of mg.orbs) {
+      if (!o.collected) {
+        let pulse = Math.sin(game.time * 8 + o.x) * 2;
+        ctx.beginPath();
+        ctx.arc(o.x, o.y, 5 + pulse, 0, Math.PI * 2);
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowColor = '#67e8f9';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // Draw Player
+    drawCharacter(mg.playerX / TILE_SIZE - 0.5, mg.playerY / TILE_SIZE - 0.5, '#fff', '#f5d5b5', '#a855f7', 'down', 0, true);
   }
 
   // Result overlay
